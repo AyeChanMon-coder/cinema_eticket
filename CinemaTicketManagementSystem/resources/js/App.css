@@ -1,7 +1,177 @@
 .App {
   min-height: 100vh;
+  background: #f4f7fb;
+  color: #0f172a;
 }
 
-button {
-  cursor: pointer;
+button { cursor: pointer; }
+
+/* ========== ADMIN LAYOUT ========== */
+.admin-layout { display: flex; min-height: 100vh; }
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  width: 240px; min-height: 100vh; background: #111827; color: #e5e7eb;
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid #1f2937; }
+.sidebar-logo { font-size: 1.5rem; }
+.sidebar-title { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
+.sidebar-nav { display: flex; flex-direction: column; padding: 12px 8px; gap: 2px; flex: 1; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px;
+  color: #9ca3af; font-size: 0.9rem; font-weight: 500; text-decoration: none;
+  transition: background 0.15s, color 0.15s; cursor: pointer;
+}
+.sidebar-link:hover { background: #1f2937; color: #f3f4f6; }
+.sidebar-link.active { background: #374151; color: #fff; }
+.sidebar-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* ========== MAIN WRAPPER ========== */
+.main-wrapper { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ========== TOP HEADER ========== */
+.top-header {
+  display: flex; justify-content: space-between; align-items: center; padding: 16px 28px;
+  background: #fff; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 50;
+}
+.header-greeting { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 0; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.logout-btn {
+  border: none; border-radius: 8px; padding: 10px 16px; background: #111827;
+  color: white; font-weight: 600; transition: background 0.15s;
+}
+.logout-btn:hover { background: #374151; }
+
+/* ========== MAIN CONTENT ========== */
+.main-content { flex: 1; padding: 28px; }
+
+/* ========== FOOTER ========== */
+.main-footer {
+  padding: 16px 28px; background: #fff; border-top: 1px solid #e5e7eb;
+  text-align: center; color: #94a3b8; font-size: 0.8rem;
+}
+
+/* ========== PAGE LAYOUT ========== */
+.page-container { max-width: 1100px; margin: 0 auto; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+.eyebrow { margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.75rem; color: #64748b; }
+.page-head h1 { margin: 0 0 4px; font-size: 1.75rem; }
+.page-sub { margin: 0; color: #64748b; font-size: 0.9rem; }
+
+/* ========== CARD ========== */
+.card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 12px 30px rgba(15,23,42,0.08); }
+
+/* ========== BUTTONS ========== */
+.btn-primary {
+  background: #111827; color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-weight: 600; font-size: 0.9rem; transition: background 0.15s;
+}
+.btn-primary:hover { background: #374151; }
+.btn-primary:disabled { opacity: 0.6; }
+.btn-secondary {
+  background: #fff; color: #374151; border: 1px solid #d1d5db; border-radius: 8px;
+  padding: 10px 20px; font-weight: 500; font-size: 0.9rem; transition: background 0.15s;
+}
+.btn-secondary:hover { background: #f3f4f6; }
+.btn-sm { font-size: 0.8rem; padding: 5px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; color: #374151; }
+.btn-sm:hover { background: #f9fafb; }
+.btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-sm.btn-edit { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.btn-sm.btn-edit:hover { background: #dbeafe; }
+.btn-sm.btn-del { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.btn-sm.btn-del:hover { background: #fee2e2; }
+.btn-sm.active-page { background: #111827; color: #fff; border-color: #111827; }
+.btn-del {
+  background: #b91c1c; color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-weight: 600; font-size: 0.9rem; transition: background 0.15s;
+}
+.btn-del:hover { background: #991b1b; }
+
+/* ========== TABLE ========== */
+.tbl-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.tbl-search {
+  padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.9rem;
+  width: 280px; max-width: 100%; outline: none; transition: border-color 0.15s;
+}
+.tbl-search:focus { border-color: #111827; }
+.tbl-count { font-size: 0.85rem; color: #64748b; white-space: nowrap; }
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.tbl th {
+  text-align: left; padding: 10px 12px; font-weight: 600; font-size: 0.8rem;
+  text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;
+  border-bottom: 2px solid #e5e7eb; white-space: nowrap;
+}
+.tbl td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.tbl tr:hover td { background: #f8fafc; }
+.tbl-empty { text-align: center; padding: 24px 0; color: #94a3b8; }
+.tbl-actions { display: flex; gap: 6px; white-space: nowrap; }
+.tbl-state { padding: 16px 0; color: #64748b; }
+.tbl-state.error { color: #b91c1c; }
+
+/* ========== BADGE ========== */
+.badge {
+  display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 500;
+  background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+}
+
+.fw-600 { font-weight: 600; }
+
+/* ========== PAGINATION ========== */
+.tbl-pagination { display: flex; gap: 4px; justify-content: center; margin-top: 16px; }
+
+/* ========== MODAL ========== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex;
+  align-items: center; justify-content: center; z-index: 200;
+}
+.modal {
+  background: #fff; border-radius: 16px; padding: 28px; width: 460px; max-width: 95vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;
+}
+.modal.modal-sm { width: 360px; }
+.modal h2 { margin: 0 0 8px; font-size: 1.25rem; }
+.modal p { margin: 0 0 16px; color: #64748b; font-size: 0.9rem; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-head h2 { margin: 0; }
+.modal-close { background: none; border: none; font-size: 1.5rem; color: #94a3b8; line-height: 1; }
+.modal-close:hover { color: #374151; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; color: #374151; }
+.modal-field input {
+  width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+  font-size: 0.9rem; outline: none; transition: border-color 0.15s;
+}
+.modal-field input:focus { border-color: #111827; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* ========== DASHBOARD ========== */
+.dashboard-page { max-width: 1100px; margin: 0 auto; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.dashboard-header h1 { margin: 0 0 6px; font-size: 2rem; }
+.dashboard-header p { margin: 0; color: #64748b; }
+.movie-list { display: grid; gap: 12px; }
+.movie-card {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 16px 18px; border: 1px solid #e5e7eb; border-radius: 12px;
+}
+.movie-card h2 { margin: 0 0 4px; font-size: 1.05rem; }
+.movie-card p { margin: 0; color: #64748b; }
+.movie-meta { display: flex; flex-wrap: wrap; gap: 12px; color: #475569; font-size: 0.95rem; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 900px) {
+  .sidebar { width: 64px; }
+  .sidebar-brand { justify-content: center; padding: 16px 8px 12px; }
+  .sidebar-title { display: none; }
+  .sidebar-link { justify-content: center; padding: 10px; }
+  .sidebar-icon { font-size: 1.2rem; }
+  .sidebar-link span:not(.sidebar-icon) { display: none; }
+  .main-wrapper { margin-left: 64px; }
+}
+@media (max-width: 700px) {
+  .page-head, .dashboard-header, .movie-card { flex-direction: column; align-items: flex-start; }
+  .tbl-toolbar { flex-direction: column; align-items: stretch; }
+  .tbl-search { width: 100%; }
 }

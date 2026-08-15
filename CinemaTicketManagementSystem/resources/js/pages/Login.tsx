@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -15,7 +15,7 @@ const Login: React.FC = () => {
     try {
       const response = await api.post("/login", { email, password });
       localStorage.setItem("admin_token", response.data.access_token);
-      navigate("/admin/dashboard");
+      navigate("/admin/movies");
     } catch (err: unknown) {
       setError("Invalid credentials. Please try again.");
     }
