@@ -15,7 +15,9 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && $request->user()->userType === 2 || $request->user()->userType === 3) {
+        $userType = $request->user()?->userType;
+
+        if (in_array((int) $userType, [2, 3], true)) {
             return $next($request);
         }
 

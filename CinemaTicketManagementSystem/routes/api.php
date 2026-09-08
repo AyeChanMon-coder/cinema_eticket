@@ -11,11 +11,12 @@ use App\Http\Controllers\SeatController;
 use App\Http\Controllers\ShowtimeController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsSuperAdmin;
 use Illuminate\Support\Facades\Route;
 
 // Public API Routes
 Route::middleware('throttle:60,1')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/admin/login', [AuthController::class, 'adminLogin']);
     Route::post('/register', [AuthController::class, 'register']);
 
     Route::get('/movies', [MovieController::class, 'index']);
@@ -47,5 +48,5 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::apiResource('bookings', BookingController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('invoices', InvoiceController::class);
-    Route::apiResource('users', UserController::class)->only(['index', 'show', 'destroy']);
+    Route::middleware(IsSuperAdmin::class)->apiResource('users', UserController::class);
 });

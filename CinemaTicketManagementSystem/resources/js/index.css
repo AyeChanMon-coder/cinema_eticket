@@ -26,3 +26,92 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #fff;
+}
+
+.login-panel {
+  width: 100%;
+  min-height: 100vh;
+  padding: clamp(48px, 12vh, 96px) 24px 48px;
+  background: #fff;
+  text-align: center;
+}
+
+.logo-placeholder {
+  width: 72px;
+  height: 32px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d8d8d8;
+  color: #555;
+  font-size: 8px;
+}
+
+.login-panel h1 {
+  margin-bottom: 24px;
+  color: #111;
+  font-size: 16px;
+}
+
+.login-panel form {
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+
+.login-field {
+  margin-bottom: 14px;
+}
+
+.login-field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.login-field input {
+  width: 100%;
+  height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.login-button {
+  width: 100%;
+  height: 44px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: #999;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: #777;
+}
+
+.login-error {
+  margin: 8px 0 0;
+  color: #c62828;
+  font-size: 13px;
+}
+
+@media (max-width: 420px) {
+  .login-panel {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}

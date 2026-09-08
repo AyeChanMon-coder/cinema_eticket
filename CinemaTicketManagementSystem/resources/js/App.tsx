@@ -10,23 +10,21 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/admin/login" element={<Login />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/movies" element={<MoviesPage />} />
             <Route path="/admin/cinemas" element={<Dashboard />} />
-            <Route path="/admin/rooms" element={<Dashboard />} />
-            <Route path="/admin/showtimes" element={<Dashboard />} />
             <Route path="/admin/bookings" element={<Dashboard />} />
-            <Route path="/admin/payments" element={<Dashboard />} />
             <Route path="/admin/users" element={<Dashboard />} />
+            <Route path="/admin/reports" element={<Dashboard />} />
           </Route>
         </Route>
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/admin/login" replace />} />
+        <Route path="*" element={<Navigate to="/admin/login" replace />} />
       </Routes>
     </div>
   );
