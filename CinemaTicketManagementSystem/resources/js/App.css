@@ -121,6 +121,11 @@ button { cursor: pointer; }
   display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 500;
   background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
 }
+.badge-superadmin { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.access-card { max-width: 620px; }
+.access-card h1 { margin: 0 0 8px; font-size: 1.6rem; }
+.access-card p:not(.eyebrow) { color: #64748b; }
+.modal-field select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font: inherit; font-size: 0.9rem; }
 
 .fw-600 { font-weight: 600; }
 

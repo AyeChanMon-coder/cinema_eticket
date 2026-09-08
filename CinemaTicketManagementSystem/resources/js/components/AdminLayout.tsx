@@ -27,7 +27,7 @@ const AdminLayout = () => {
           <span className="sidebar-title">Cinema Admin</span>
         </div>
         <nav className="sidebar-nav" aria-label="Admin navigation">
-          {menuItems.map((item) => (
+          {menuItems.filter((item) => item.label !== "Users" || userType === "3").map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
