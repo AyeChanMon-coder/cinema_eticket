@@ -22,6 +22,8 @@ const emptyForm: MovieForm = {
   rating: 0,
 };
 
+const ITEMS_PER_PAGE = 5;
+
 const MoviesPage = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [form, setForm] = useState<MovieForm>(emptyForm);
@@ -29,6 +31,7 @@ const MoviesPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -120,6 +123,11 @@ const MoviesPage = () => {
   const filteredMovies = movies.filter((movie) =>
     `${movie.title} ${movie.genre}`.toLowerCase().includes(search.toLowerCase()),
   );
+  const totalPages = Math.max(1, Math.ceil(filteredMovies.length / ITEMS_PER_PAGE));
+  const visibleMovies = filteredMovies.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="page-container">
@@ -140,7 +148,7 @@ const MoviesPage = () => {
             aria-label="Search movies"
             placeholder="Search movies..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => { setSearch(event.target.value); setCurrentPage(1); }}
           />
           <span className="tbl-count">{filteredMovies.length} movies</span>
         </div>
@@ -149,7 +157,7 @@ const MoviesPage = () => {
             <table className="tbl">
               <thead><tr><th>Movie</th><th>Genre</th><th>Duration</th><th>Rating</th><th>Showtimes</th><th>Actions</th></tr></thead>
               <tbody>
-                {filteredMovies.map((movie) => (
+                {visibleMovies.map((movie) => (
                   <tr key={movie.movieId}>
                     <td><div className="movie-cell">{movie.image ? <img className="movie-thumb" src={`${window.location.origin}/storage/${movie.image}`} alt="" /> : <div className="movie-thumb movie-thumb-empty">No image</div>}<div><strong>{movie.title}</strong><small className="table-description">{movie.description}</small></div></div></td>
                     <td><span className="badge">{movie.genre}</span></td>
@@ -162,6 +170,15 @@ const MoviesPage = () => {
               </tbody>
             </table>
             {!loading && filteredMovies.length === 0 && <p className="tbl-empty">No movies found.</p>}
+            {filteredMovies.length > ITEMS_PER_PAGE && (
+              <div className="tbl-pagination">
+                <button className="btn-sm" type="button" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => page - 1)}>Previous</button>
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                  <button key={page} className={`btn-sm${currentPage === page ? " active-page" : ""}`} type="button" onClick={() => setCurrentPage(page)}>{page}</button>
+                ))}
+                <button className="btn-sm" type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => page + 1)}>Next</button>
+              </div>
+            )}
           </div>
         )}
       </section>

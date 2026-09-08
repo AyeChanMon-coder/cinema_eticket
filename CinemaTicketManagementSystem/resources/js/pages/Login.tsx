@@ -25,7 +25,7 @@ const Login: React.FC = () => {
   return (
     <main className="login-page">
       <section className="login-panel">
-        <div className="logo-placeholder">Logo</div>
+        <img className="login-logo" src="/cinema-logo.svg" alt="Cinema" />
         <h1>LOGIN</h1>
         <form onSubmit={handleSubmit}>
           <div className="login-field">

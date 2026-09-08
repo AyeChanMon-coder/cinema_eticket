@@ -23,7 +23,7 @@ const AdminLayout = () => {
     <div className="admin-layout">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="sidebar-logo">C</div>
+          <img className="sidebar-logo" src="/cinema-logo.svg" alt="Cinema" />
           <span className="sidebar-title">Cinema Admin</span>
         </div>
         <nav className="sidebar-nav" aria-label="Admin navigation">

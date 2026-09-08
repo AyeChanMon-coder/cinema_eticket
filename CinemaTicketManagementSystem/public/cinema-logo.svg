@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1536" role="img" aria-label="Orange C logo">
+  <defs>
+    <linearGradient id="bg" x1="0.08" y1="0.05" x2="0.92" y2="0.95">
+      <stop offset="0" stop-color="#ffb000"/>
+      <stop offset="0.30" stop-color="#ff7410"/>
+      <stop offset="0.70" stop-color="#ff5a08"/>
+      <stop offset="1" stop-color="#ff9b08"/>
+    </linearGradient>
+    <linearGradient id="main" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#ff8a08"/>
+      <stop offset="0.42" stop-color="#ff6808"/>
+      <stop offset="1" stop-color="#ff4e09"/>
+    </linearGradient>
+    <linearGradient id="accentTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb20a"/>
+      <stop offset="1" stop-color="#ff7809"/>
+    </linearGradient>
+    <linearGradient id="accentBottom" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7a08"/>
+      <stop offset="1" stop-color="#ff9e08"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".12"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="rounded">
+      <rect x="193" y="168" width="1121" height="1158" rx="258" ry="258"/>
+    </clipPath>
+  </defs>
+
+  <!-- clean white canvas -->
+  <rect width="1536" height="1536" fill="#fff"/>
+
+  <!-- rounded orange logo body -->
+  <g filter="url(#softShadow)">
+    <rect x="193" y="168" width="1121" height="1158" rx="258" fill="url(#main)"/>
+    <g clip-path="url(#rounded)">
+      <!-- upper-left folded highlight -->
+      <path d="M193 168H610C522 256 451 328 351 423C279 491 239 565 224 667L193 868Z"
+            fill="url(#accentTop)" opacity=".92"/>
+      <path d="M193 168H610C521 257 450 330 350 424C282 489 241 561 225 657L193 807Z"
+            fill="#ff9c08" opacity=".42"/>
+      <!-- lower-right folded highlight -->
+      <path d="M1314 642V1326H705C850 1262 964 1187 1056 1080C1148 973 1226 828 1314 642Z"
+            fill="url(#accentBottom)" opacity=".95"/>
+      <path d="M1314 641V1326H782C933 1248 1028 1160 1100 1052C1184 927 1246 803 1314 641Z"
+            fill="#ffb00a" opacity=".34"/>
+      <!-- subtle center orange variation -->
+      <path d="M340 1326C555 1255 704 1192 819 1091C941 984 1011 863 1082 726C1152 590 1221 455 1314 371V1326Z"
+            fill="#ff5a08" opacity=".16"/>
+    </g>
+  </g>
+
+  <!-- white C mark -->
+  <path d="
+    M 790 370
+    C 627 370 503 425 415 520
+    C 331 611 286 727 286 857
+    C 286 989 333 1101 417 1191
+    C 505 1286 628 1341 790 1341
+    L 956 1341
+    C 1003 1341 1027 1314 1027 1270
+    L 1027 1186
+    C 1027 1140 1002 1117 956 1117
+    L 797 1117
+    C 726 1117 671 1092 631 1051
+    C 590 1009 570 946 570 858
+    C 570 769 590 704 631 661
+    C 671 620 726 595 797 595
+    L 956 595
+    C 1002 595 1027 572 1027 527
+    L 1027 443
+    C 1027 395 1003 370 956 370
+    Z" fill="#fff"/>
+
+</svg>

@@ -17,7 +17,7 @@ button { cursor: pointer; }
 .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid #1f2937; }
 .sidebar-logo { font-size: 1.5rem; }
 .sidebar-title { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
-.sidebar-logo { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: #f97316; color: #fff; font-weight: 800; }
+.sidebar-logo { width: 32px; height: 32px; display: block; border-radius: 10px; object-fit: cover; }
 .sidebar-nav { display: flex; flex-direction: column; padding: 12px 8px; gap: 2px; flex: 1; }
 .sidebar-link {
   display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px;

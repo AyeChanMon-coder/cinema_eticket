@@ -43,16 +43,12 @@ a {
   text-align: center;
 }
 
-.logo-placeholder {
-  width: 72px;
-  height: 32px;
+.login-logo {
+  width: 76px;
+  height: 76px;
   margin: 0 auto 16px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #d8d8d8;
-  color: #555;
-  font-size: 8px;
+  display: block;
+  object-fit: contain;
 }
 
 .login-panel h1 {
