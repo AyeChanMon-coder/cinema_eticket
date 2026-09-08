@@ -7,7 +7,6 @@ import CinemasPage from "./pages/CinemasPage";
 import UsersPage from "./pages/UsersPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
-import UserProtectedRoute from "./components/UserProtectedRoute";
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import UserHome from "./pages/UserHome";
@@ -31,12 +30,10 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<UserProtectedRoute />}>
-          <Route path="/user/home" element={<UserHome />} />
-        </Route>
+        <Route path="/user/home" element={<UserHome />} />
 
-        <Route path="/" element={<Navigate to="/admin/login" replace />} />
-        <Route path="*" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/" element={<UserHome />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );

@@ -68,6 +68,52 @@ a {
 .user-home-panel p:not(.eyebrow) { margin-bottom: 24px; color: #64748b; }
 .user-home-logo { width: 80px; height: 80px; object-fit: contain; }
 
+.catalog-home { min-height: 100vh; background: #fff; color: #111; }
+.catalog-header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; padding: 0 7%; border-bottom: 1px solid #ddd; font-size: 13px; }
+.catalog-brand { display: flex; align-items: center; gap: 7px; color: #111; }
+.catalog-brand img { width: 30px; height: 30px; object-fit: contain; }
+.catalog-nav, .catalog-actions { display: flex; align-items: center; gap: 12px; }
+.catalog-nav a, .catalog-actions a { padding: 5px 8px; border-radius: 4px; color: #111; }
+.catalog-nav a:hover, .catalog-actions a:hover { background: #f1f1f1; }
+.catalog-nav button, .catalog-actions button { border: 0; background: transparent; font: inherit; cursor: pointer; }
+.user-menu { position: relative; }
+.profile-button { width: 42px; height: 42px; padding: 0 !important; border-radius: 50%; overflow: hidden; }
+.profile-button img { display: block; width: 100%; height: 100%; }
+.profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 20; width: 150px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
+.profile-dropdown button { display: block; width: 100%; padding: 10px 12px !important; border-radius: 5px; text-align: left; color: #1f2937; }
+.profile-dropdown button:hover { background: #f3f4f6; }
+.profile-dropdown button:last-child { color: #b91c1c; }
+.booking-icon { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #20202a !important; color: #fff !important; }
+.catalog-content { width: min(100%, 980px); margin: 18px auto 0; padding: 0 24px 60px; }
+.catalog-subheader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.catalog-brand-secondary img { width: 27px; height: 27px; }
+.catalog-brand-secondary strong { font-size: 14px; }
+.catalog-actions a { border: 1px solid #aaa; padding: 4px 9px; font-size: 10px; }
+.movie-search { position: relative; display: flex; align-items: center; max-width: 620px; margin: 0 auto 18px; }
+.movie-search input { width: 100%; height: 34px; padding: 0 40px 0 14px; border: 0; background: #e8e8e8; font-size: 11px; outline: none; }
+.movie-search > span { position: absolute; right: 52px; color: #555; font-size: 20px; }
+.search-booking { margin-left: 14px; flex: 0 0 auto; border: 0; cursor: pointer; }
+.now-showing-title { margin: 12px 0 18px; text-align: center; font-size: clamp(1.4rem, 3vw, 2rem); }
+.public-movie-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 18px; }
+.public-movie-card { min-width: 0; text-align: center; }
+.public-poster { aspect-ratio: 1.35 / 1; display: grid; place-items: center; overflow: hidden; background: #ddd; color: #777; }
+.public-poster img { width: 100%; height: 100%; object-fit: cover; }
+.public-movie-card strong, .public-movie-card small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.public-movie-card strong { margin-top: 7px; font-size: 12px; }
+.public-movie-card small { margin-top: 3px; color: #777; font-size: 10px; }
+.public-movie-card button { margin-top: 5px; border: 0; background: #ddd; padding: 3px 11px; font-size: 10px; cursor: pointer; }
+.catalog-state { padding: 28px; text-align: center; color: #777; }
+.catalog-dots { display: flex; justify-content: center; gap: 4px; margin-top: 42px; }
+.catalog-dots span { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
+.catalog-dots span.active { background: #826b6b; }
+
+@media (max-width: 650px) {
+  .catalog-header { min-height: 58px; padding: 0 16px; }
+  .catalog-nav span { display: none; }
+  .catalog-content { padding-right: 16px; padding-left: 16px; }
+  .public-movie-grid { grid-template-columns: repeat(2, 1fr); gap: 22px 12px; }
+}
+
 .login-panel form {
   width: min(100%, 360px);
   margin: 0 auto;
