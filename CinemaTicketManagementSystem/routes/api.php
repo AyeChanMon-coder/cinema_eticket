@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 // Public API Routes
 Route::middleware('throttle:60,1')->group(function () {
     Route::post('/admin/login', [AuthController::class, 'adminLogin']);
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/user/login', [AuthController::class, 'userLogin']);
+    Route::post('/user/register', [AuthController::class, 'userRegister']);
 
     Route::get('/movies', [MovieController::class, 'index']);
     Route::get('/movies/{movie}', [MovieController::class, 'show']);

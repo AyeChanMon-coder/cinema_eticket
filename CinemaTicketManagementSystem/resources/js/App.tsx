@@ -7,12 +7,18 @@ import CinemasPage from "./pages/CinemasPage";
 import UsersPage from "./pages/UsersPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
+import UserProtectedRoute from "./components/UserProtectedRoute";
+import UserLogin from "./pages/UserLogin";
+import UserRegister from "./pages/UserRegister";
+import UserHome from "./pages/UserHome";
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path="/admin/login" element={<Login />} />
+        <Route path="/user/login" element={<UserLogin />} />
+        <Route path="/user/register" element={<UserRegister />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
@@ -23,6 +29,10 @@ function App() {
             <Route path="/admin/users" element={<UsersPage />} />
             <Route path="/admin/reports" element={<Dashboard />} />
           </Route>
+        </Route>
+
+        <Route element={<UserProtectedRoute />}>
+          <Route path="/user/home" element={<UserHome />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/admin/login" replace />} />
