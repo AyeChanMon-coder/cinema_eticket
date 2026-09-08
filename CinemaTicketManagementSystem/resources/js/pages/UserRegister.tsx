@@ -23,7 +23,7 @@ const UserRegister = () => {
       });
       localStorage.setItem("user_token", response.data.access_token);
       localStorage.setItem("user_id", String(response.data.userId));
-      navigate("/user/home");
+      navigate("/");
     } catch {
       setError("Unable to create account. Check your details and try again.");
     }
@@ -43,7 +43,7 @@ const UserRegister = () => {
           {error && <p className="login-error">{error}</p>}
           <button className="login-button" type="submit">Sign up</button>
         </form>
-        <p className="auth-switch">Already have an account? <Link to="/user/login">Login</Link></p>
+        <p className="auth-switch">Already have an account? <Link to="/user/login" state={{ userEntry: true }}>Login</Link></p>
       </section>
     </main>
   );

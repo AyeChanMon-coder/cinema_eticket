@@ -15,7 +15,7 @@ const UserLogin = () => {
       const response = await api.post("/user/login", { email, password });
       localStorage.setItem("user_token", response.data.access_token);
       localStorage.setItem("user_id", String(response.data.userId));
-      navigate("/user/home");
+      navigate("/");
     } catch {
       setError("User email or password is incorrect.");
     }
@@ -33,7 +33,7 @@ const UserLogin = () => {
           {error && <p className="login-error">{error}</p>}
           <button className="login-button" type="submit">Login</button>
         </form>
-        <p className="auth-switch">Don't have an account? <Link to="/user/register">Sign up</Link></p>
+        <p className="auth-switch">Don't have an account? <Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></p>
       </section>
     </main>
   );
