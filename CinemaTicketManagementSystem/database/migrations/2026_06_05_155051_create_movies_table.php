@@ -15,6 +15,8 @@ return new class extends Migration
         $table->id('movieId');
         $table->string('title');
         $table->string('genre');
+        $table->string('image')->nullable();
+        $table->text('description');
         $table->integer('duration'); // Minutes
         $table->float('rating');
         $table->timestamps();
