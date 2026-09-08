@@ -11,7 +11,6 @@ use App\Http\Controllers\SeatController;
 use App\Http\Controllers\ShowtimeController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdmin;
-use App\Http\Middleware\IsSuperAdmin;
 use Illuminate\Support\Facades\Route;
 
 // Public API Routes
@@ -48,5 +47,5 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::apiResource('bookings', BookingController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('invoices', InvoiceController::class);
-    Route::middleware(IsSuperAdmin::class)->apiResource('users', UserController::class);
+    Route::apiResource('users', UserController::class);
 });

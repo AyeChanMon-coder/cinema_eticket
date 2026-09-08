@@ -16,6 +16,7 @@ const AdminLayout = () => {
   const logout = () => {
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_user_type");
+    localStorage.removeItem("admin_user_id");
     navigate("/admin/login", { replace: true });
   };
 
@@ -27,7 +28,7 @@ const AdminLayout = () => {
           <span className="sidebar-title">Cinema Admin</span>
         </div>
         <nav className="sidebar-nav" aria-label="Admin navigation">
-          {menuItems.filter((item) => item.label !== "Users" || userType === "3").map((item) => (
+          {menuItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
