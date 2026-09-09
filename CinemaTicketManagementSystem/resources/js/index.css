@@ -123,7 +123,7 @@ a {
 .movie-pagination button:disabled { color: #bbb; cursor: not-allowed; }
 .booking-page { min-height: 100vh; padding: 28px 6%; background: #fff; color: #111; }
 .booking-close { position: absolute; top: 18px; right: 28px; border: 0; background: transparent; color: #111; font-size: 24px; line-height: 1; cursor: pointer; }
-.booking-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; width: min(100%, 960px); margin: 0 auto; padding-top: 8px; }
+.booking-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 48px; width: min(100%, 960px); margin: 0 auto; padding-top: 8px; }
 .booking-options h1, .booking-options h2 { margin: 0 0 12px; font-size: 18px; }
 .booking-options h2 { margin-top: 30px; font-size: 17px; }
 .booking-chips, .booking-date-list, .booking-time-list { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -135,10 +135,10 @@ a {
 .booking-date strong { font-size: 12px; }
 .booking-time { min-width: 48px; padding: 7px 6px; font-size: 10px; }
 .booking-empty { color: #888; font-size: 12px; }
-.booking-summary { padding-top: 8px; }
-.booking-summary-poster { width: 100%; height: 170px; display: grid; place-items: center; background: #ddd; color: #777; }
-.booking-summary-poster img { width: 100%; height: 100%; object-fit: cover; }
-.booking-summary h2 { margin: 12px 0 5px; font-size: 17px; }
+.booking-summary { min-width: 0; padding-top: 8px; }
+.booking-summary-poster { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; background: #f1f1f1; color: #777; }
+.booking-summary-poster img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.booking-summary h2 { margin: 12px 0 5px; font-size: 17px; line-height: 1.3; overflow-wrap: anywhere; }
 .booking-summary > p { margin: 0; color: #777; font-size: 11px; }
 .booking-confirm { display: grid; gap: 10px; margin-top: 24px; padding: 18px; border: 1px solid #ddd; border-radius: 4px; }
 .booking-confirm strong { font-size: 13px; }
@@ -161,7 +161,7 @@ a {
   .booking-close { top: 14px; right: 18px; }
   .booking-layout { grid-template-columns: 1fr; gap: 30px; padding-top: 28px; }
   .booking-summary { order: -1; padding: 0 24px; }
-  .booking-summary-poster { height: 190px; }
+  .booking-summary-poster { aspect-ratio: 16 / 10; }
 }
 
 .login-panel form {
