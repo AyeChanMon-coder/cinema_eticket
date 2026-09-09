@@ -146,6 +146,27 @@ a {
 .booking-confirm button { border: 0; padding: 10px; background: #999; color: #fff; cursor: pointer; }
 .booking-confirm button:not(:disabled) { background: #20202a; }
 .booking-confirm button:disabled { cursor: not-allowed; }
+.seat-page { min-height: 100vh; display: flex; flex-direction: column; background: #fff; color: #111; }
+.seat-content { flex: 1; width: min(100%, 1120px); margin: 0 auto; padding: 34px 6% 90px; }
+.seat-content h1 { margin: 0 0 34px; font-size: 22px; }
+.seat-map { display: grid; gap: 10px; width: 100%; }
+.seat-row { display: flex; align-items: center; gap: 10px; }
+.seat-row-label { width: 18px; color: #777; font-size: 10px; text-align: center; }
+.seat-row-seats { display: grid; grid-template-columns: repeat(20, minmax(24px, 1fr)); gap: 7px; width: 100%; }
+.seat { min-width: 24px; height: 22px; border: 0; border-radius: 4px; background: #c6c3c3; color: #111; font-size: 8px; cursor: pointer; }
+.seat:hover:not(:disabled), .seat.selected { background: #111; color: #fff; }
+.seat.booked { background: #777; color: #fff; cursor: not-allowed; }
+.seat-screen { height: 16px; display: grid; place-items: center; margin: 20px 0 0 28px; border-radius: 10px; background: #c6c3c3; font-size: 9px; }
+.seat-state, .seat-error { color: #777; font-size: 13px; }
+.seat-error { color: #b91c1c; }
+.seat-footer { display: flex; align-items: center; justify-content: center; gap: 54px; padding: 22px 6%; border-top: 1px solid #d1d5db; }
+.seat-footer div { display: grid; gap: 5px; min-width: 100px; }
+.seat-footer small { color: #555; font-size: 9px; }
+.seat-footer strong { font-size: 17px; white-space: nowrap; }
+.seat-back, .seat-proceed { min-width: 130px; height: 34px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; color: #777; cursor: pointer; }
+.seat-proceed { min-width: 150px; border-color: #999; background: #999; color: #fff; }
+.seat-proceed:not(:disabled) { background: #20202a; border-color: #20202a; }
+.seat-proceed:disabled { cursor: not-allowed; }
 
 @media (max-width: 650px) {
   .catalog-header { min-height: 58px; padding: 0 16px; }
@@ -162,6 +183,13 @@ a {
   .booking-layout { grid-template-columns: 1fr; gap: 30px; padding-top: 28px; }
   .booking-summary { order: -1; padding: 0 24px; }
   .booking-summary-poster { aspect-ratio: 16 / 10; }
+  .seat-content { padding: 24px 16px 120px; overflow-x: auto; }
+  .seat-content h1 { margin-bottom: 24px; }
+  .seat-map { min-width: 620px; }
+  .seat-footer { position: fixed; right: 0; bottom: 0; left: 0; gap: 12px; padding: 14px 12px; flex-wrap: wrap; background: #fff; }
+  .seat-footer div { min-width: 80px; }
+  .seat-footer strong { font-size: 13px; }
+  .seat-back, .seat-proceed { min-width: 110px; }
 }
 
 .login-panel form {

@@ -12,6 +12,8 @@ import UserRegister from "./pages/UserRegister";
 import UserHome from "./pages/UserHome";
 import UserEntryRoute from "./components/UserEntryRoute";
 import UserBooking from "./pages/UserBooking";
+import SeatSelection from "./pages/SeatSelection";
+import SeatsPage from "./pages/SeatsPage";
 
 function App() {
   return (
@@ -23,12 +25,14 @@ function App() {
           <Route path="/user/register" element={<UserRegister />} />
         </Route>
         <Route path="/user/booking" element={<UserBooking />} />
+        <Route path="/user/booking/seats" element={<SeatSelection />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/movies" element={<MoviesPage />} />
             <Route path="/admin/cinemas" element={<CinemasPage />} />
+            <Route path="/admin/seats" element={<SeatsPage />} />
             <Route path="/admin/bookings" element={<Dashboard />} />
             <Route path="/admin/users" element={<UsersPage />} />
             <Route path="/admin/reports" element={<Dashboard />} />

@@ -83,7 +83,7 @@ const UserBooking = () => {
           <div className="booking-summary-poster">{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</div>
           <h2>{movie.title}</h2>
           <p>{movie.duration} min</p>
-          <div className="booking-confirm"><strong>{selected?.room?.cinema?.location ?? "Select a location"}</strong><span>{selected ? `${selected.date} · ${selected.time.slice(0, 5)}` : "Select a date and time"}</span><button type="button" disabled={!selectedShowtime}>Proceed</button></div>
+          <div className="booking-confirm"><strong>{selected?.room?.cinema?.location ?? "Select a location"}</strong><span>{selected ? `${selected.date} · ${selected.time.slice(0, 5)}` : "Select a date and time"}</span><button type="button" disabled={!selectedShowtime} onClick={() => selected && navigate("/user/booking/seats", { state: { movie, showtime: selected } })}>Proceed</button></div>
         </aside>
       </section>
     </main>

@@ -4,6 +4,7 @@ const menuItems = [
   { label: "Dashboard", path: "/admin/dashboard", icon: "⌂" },
   { label: "Movies", path: "/admin/movies", icon: "▣" },
   { label: "Cinemas", path: "/admin/cinemas", icon: "▤" },
+  { label: "Seats", path: "/admin/seats", icon: "▦" },
   { label: "Bookings", path: "/admin/bookings", icon: "▥" },
   { label: "Users", path: "/admin/users", icon: "♙" },
   { label: "Reports", path: "/admin/reports", icon: "◒" },
