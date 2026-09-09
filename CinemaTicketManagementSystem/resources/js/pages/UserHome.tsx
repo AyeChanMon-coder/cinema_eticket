@@ -20,6 +20,7 @@ const UserHome = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const logout = () => {
     localStorage.removeItem("user_token");
@@ -57,6 +58,16 @@ const UserHome = () => {
   const filteredMovies = useMemo(() => movies.filter((movie) =>
     `${movie.title} ${movie.genre}`.toLowerCase().includes(search.toLowerCase()),
   ), [movies, search]);
+  const totalPages = Math.max(1, Math.ceil(filteredMovies.length / 8));
+  const paginatedMovies = filteredMovies.slice((currentPage - 1) * 8, currentPage * 8);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   return (
     <main className="catalog-home">
@@ -67,9 +78,9 @@ const UserHome = () => {
       <section className="catalog-content">
         <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>▤</button></div>
         <h1 className="now-showing-title">Now Showing</h1>
-        {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{filteredMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><button className="public-poster" type="button" aria-label={`View details for ${movie.title}`} onClick={() => { setSelectedMovie(movie); setDescriptionExpanded(false); }}>{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</button><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small></article>)}</div>}
+        {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{paginatedMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><button className="public-poster" type="button" aria-label={`View details for ${movie.title}`} onClick={() => { setSelectedMovie(movie); setDescriptionExpanded(false); }}>{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</button><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small></article>)}</div>}
         {!loading && filteredMovies.length === 0 && <p className="catalog-state">No movies found.</p>}
-        <div className="catalog-dots"><span className="active" /><span /><span /></div>
+        {!loading && totalPages > 1 && <nav className="movie-pagination" aria-label="Movie pages"><button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => page - 1)}>‹</button>{Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => <button className={page === currentPage ? "active" : ""} type="button" key={page} aria-label={`Page ${page}`} aria-current={page === currentPage ? "page" : undefined} onClick={() => setCurrentPage(page)}>{page}</button>)}<button type="button" aria-label="Next page" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => page + 1)}>›</button></nav>}
       </section>
       {selectedMovie && <div className="movie-detail-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedMovie(null); }}><section className="movie-detail-modal" role="dialog" aria-modal="true" aria-labelledby="movie-detail-title"><button className="movie-detail-close" type="button" aria-label="Close movie details" onClick={() => setSelectedMovie(null)}>×</button><div className="movie-detail-poster">{selectedMovie.image ? <img src={`${window.location.origin}/storage/${selectedMovie.image}`} alt={selectedMovie.title} /> : <span>No poster</span>}</div><div className="movie-detail-copy"><p className="movie-detail-kicker">Now showing</p><h2 id="movie-detail-title">{selectedMovie.title}</h2><p className="movie-detail-meta">{selectedMovie.genre} · {selectedMovie.duration} min · Rating {selectedMovie.rating}</p><p className="movie-detail-description">{descriptionExpanded || selectedMovie.description.length <= 100 ? selectedMovie.description : `${selectedMovie.description.slice(0, 100)}...`}</p>{selectedMovie.description.length > 100 && <button className="movie-detail-more" type="button" onClick={() => setDescriptionExpanded((expanded) => !expanded)}>{descriptionExpanded ? "See less" : "See more"}</button>}<button className="movie-detail-book" type="button" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>Book now</button></div></section></div>}
     </main>

@@ -117,9 +117,10 @@ a {
 .movie-detail-book { display: block; margin-top: 18px; border: 0; padding: 10px 18px; background: #20202a; color: #fff; font-size: 12px; cursor: pointer; }
 .movie-detail-book:hover { background: #826b6b; }
 .catalog-state { padding: 28px; text-align: center; color: #777; }
-.catalog-dots { display: flex; justify-content: center; gap: 4px; margin-top: 42px; }
-.catalog-dots span { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
-.catalog-dots span.active { background: #826b6b; }
+.movie-pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; }
+.movie-pagination button { min-width: 30px; height: 30px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 12px; cursor: pointer; }
+.movie-pagination button:hover:not(:disabled), .movie-pagination button.active { border-color: #20202a; background: #20202a; color: #fff; }
+.movie-pagination button:disabled { color: #bbb; cursor: not-allowed; }
 
 @media (max-width: 650px) {
   .catalog-header { min-height: 58px; padding: 0 16px; }
