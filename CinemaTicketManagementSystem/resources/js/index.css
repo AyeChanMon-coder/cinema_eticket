@@ -121,6 +121,31 @@ a {
 .movie-pagination button { min-width: 30px; height: 30px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 12px; cursor: pointer; }
 .movie-pagination button:hover:not(:disabled), .movie-pagination button.active { border-color: #20202a; background: #20202a; color: #fff; }
 .movie-pagination button:disabled { color: #bbb; cursor: not-allowed; }
+.booking-page { min-height: 100vh; padding: 28px 6%; background: #fff; color: #111; }
+.booking-close { position: absolute; top: 18px; right: 28px; border: 0; background: transparent; color: #111; font-size: 24px; line-height: 1; cursor: pointer; }
+.booking-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; width: min(100%, 960px); margin: 0 auto; padding-top: 8px; }
+.booking-options h1, .booking-options h2 { margin: 0 0 12px; font-size: 18px; }
+.booking-options h2 { margin-top: 30px; font-size: 17px; }
+.booking-chips, .booking-date-list, .booking-time-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.booking-chip, .booking-date, .booking-time { border: 1px solid #c8c8c8; background: #fff; color: #222; cursor: pointer; }
+.booking-chip { border-radius: 14px; padding: 5px 12px; font-size: 10px; }
+.booking-chip:hover, .booking-chip.selected, .booking-date.selected, .booking-time.selected { border-color: #20202a; background: #20202a; color: #fff; }
+.booking-date { display: grid; min-width: 48px; padding: 7px 8px; gap: 2px; text-align: center; }
+.booking-date small { font-size: 8px; }
+.booking-date strong { font-size: 12px; }
+.booking-time { min-width: 48px; padding: 7px 6px; font-size: 10px; }
+.booking-empty { color: #888; font-size: 12px; }
+.booking-summary { padding-top: 8px; }
+.booking-summary-poster { width: 100%; height: 170px; display: grid; place-items: center; background: #ddd; color: #777; }
+.booking-summary-poster img { width: 100%; height: 100%; object-fit: cover; }
+.booking-summary h2 { margin: 12px 0 5px; font-size: 17px; }
+.booking-summary > p { margin: 0; color: #777; font-size: 11px; }
+.booking-confirm { display: grid; gap: 10px; margin-top: 24px; padding: 18px; border: 1px solid #ddd; border-radius: 4px; }
+.booking-confirm strong { font-size: 13px; }
+.booking-confirm span { color: #777; font-size: 10px; }
+.booking-confirm button { border: 0; padding: 10px; background: #999; color: #fff; cursor: pointer; }
+.booking-confirm button:not(:disabled) { background: #20202a; }
+.booking-confirm button:disabled { cursor: not-allowed; }
 
 @media (max-width: 650px) {
   .catalog-header { min-height: 58px; padding: 0 16px; }
@@ -132,6 +157,11 @@ a {
   .movie-detail-poster { height: 180px; }
   .movie-detail-poster img { max-width: 135px; height: 165px; }
   .movie-detail-copy { padding: 24px; }
+  .booking-page { padding: 22px 18px 32px; }
+  .booking-close { top: 14px; right: 18px; }
+  .booking-layout { grid-template-columns: 1fr; gap: 30px; padding-top: 28px; }
+  .booking-summary { order: -1; padding: 0 24px; }
+  .booking-summary-poster { height: 190px; }
 }
 
 .login-panel form {

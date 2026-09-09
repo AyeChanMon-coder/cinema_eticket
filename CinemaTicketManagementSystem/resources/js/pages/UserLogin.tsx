@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 const UserLogin = () => {
@@ -7,6 +7,7 @@ const UserLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -15,7 +16,8 @@ const UserLogin = () => {
       const response = await api.post("/user/login", { email, password });
       localStorage.setItem("user_token", response.data.access_token);
       localStorage.setItem("user_id", String(response.data.userId));
-      navigate("/");
+      const bookingMovie = (location.state as { bookingMovie?: unknown } | null)?.bookingMovie;
+      navigate(bookingMovie ? "/user/booking" : "/", bookingMovie ? { state: { movie: bookingMovie } } : undefined);
     } catch {
       setError("User email or password is incorrect.");
     }

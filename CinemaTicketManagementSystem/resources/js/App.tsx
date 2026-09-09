@@ -11,6 +11,7 @@ import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import UserHome from "./pages/UserHome";
 import UserEntryRoute from "./components/UserEntryRoute";
+import UserBooking from "./pages/UserBooking";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/user/login" element={<UserLogin />} />
           <Route path="/user/register" element={<UserRegister />} />
         </Route>
+        <Route path="/user/booking" element={<UserBooking />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>

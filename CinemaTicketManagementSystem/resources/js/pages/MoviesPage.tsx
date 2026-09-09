@@ -9,10 +9,38 @@ interface Movie {
   description: string;
   duration: number;
   rating: number;
-  showtimes?: Array<Record<string, unknown>>;
+  showtimes?: Showtime[];
 }
 
 type MovieForm = Omit<Movie, "movieId" | "showtimes">;
+
+interface Showtime {
+  showtimeId: number;
+  date: string;
+  time: string;
+  roomId: number;
+  movieId: number;
+}
+
+interface Cinema {
+  cinemaId: number;
+  name: string;
+  location: string;
+}
+
+interface Room {
+  roomId: number;
+  name: string;
+  cinemaId: number;
+}
+
+interface ShowtimeForm {
+  showtimeId?: number;
+  date: string;
+  time: string;
+  cinemaId: string;
+  roomId: string;
+}
 
 const emptyForm: MovieForm = {
   title: "",
@@ -21,6 +49,8 @@ const emptyForm: MovieForm = {
   duration: 120,
   rating: 0,
 };
+
+const emptyShowtime: ShowtimeForm = { date: "", time: "", cinemaId: "", roomId: "" };
 
 const ITEMS_PER_PAGE = 5;
 
@@ -35,6 +65,9 @@ const MoviesPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [cinemas, setCinemas] = useState<Cinema[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [showtimeForms, setShowtimeForms] = useState<ShowtimeForm[]>([]);
 
   const loadMovies = async () => {
     try {
@@ -49,12 +82,23 @@ const MoviesPage = () => {
 
   useEffect(() => {
     void loadMovies();
+    const loadShowtimeOptions = async () => {
+      try {
+        const [cinemaResponse, roomResponse] = await Promise.all([api.get("/admin/cinemas"), api.get("/admin/rooms")]);
+        setCinemas(Array.isArray(cinemaResponse.data) ? cinemaResponse.data : []);
+        setRooms(Array.isArray(roomResponse.data) ? roomResponse.data : []);
+      } catch {
+        setError("Unable to load cinema and room options.");
+      }
+    };
+    void loadShowtimeOptions();
   }, []);
 
   const openCreate = () => {
     setEditingMovie(null);
     setForm(emptyForm);
     setImageFile(null);
+    setShowtimeForms([]);
     setIsFormOpen(true);
     setError("");
   };
@@ -70,6 +114,10 @@ const MoviesPage = () => {
       rating: movie.rating,
     });
     setImageFile(null);
+    setShowtimeForms((movie.showtimes ?? []).map((showtime) => {
+      const room = rooms.find((item) => item.roomId === showtime.roomId);
+      return { showtimeId: showtime.showtimeId, date: showtime.date, time: showtime.time.slice(0, 5), cinemaId: room ? String(room.cinemaId) : "", roomId: String(showtime.roomId) };
+    }));
     setError("");
   };
 
@@ -78,7 +126,16 @@ const MoviesPage = () => {
     setIsFormOpen(false);
     setForm(emptyForm);
     setImageFile(null);
+    setShowtimeForms([]);
   };
+
+  const updateShowtime = (index: number, values: Partial<ShowtimeForm>) => {
+    setShowtimeForms((current) => current.map((showtime, itemIndex) => itemIndex === index ? { ...showtime, ...values } : showtime));
+  };
+
+  const addShowtime = () => setShowtimeForms((current) => [...current, { ...emptyShowtime }]);
+
+  const removeShowtime = (index: number) => setShowtimeForms((current) => current.filter((_, itemIndex) => itemIndex !== index));
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -94,12 +151,22 @@ const MoviesPage = () => {
       formData.append("rating", String(form.rating));
       if (imageFile) formData.append("image", imageFile);
 
+      let movieId = editingMovie?.movieId;
       if (editingMovie) {
         formData.append("_method", "PUT");
         await api.post(`/admin/movies/${editingMovie.movieId}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
       } else {
-        await api.post("/admin/movies", formData, { headers: { "Content-Type": "multipart/form-data" } });
+        const response = await api.post("/admin/movies", formData, { headers: { "Content-Type": "multipart/form-data" } });
+        movieId = response.data.movieId;
       }
+      if (!movieId) throw new Error("Movie was not saved.");
+      const originalShowtimeIds = new Set((editingMovie?.showtimes ?? []).map((showtime) => showtime.showtimeId));
+      const submittedShowtimeIds = new Set(showtimeForms.filter((showtime) => showtime.showtimeId).map((showtime) => showtime.showtimeId));
+      await Promise.all([...originalShowtimeIds].filter((showtimeId) => !submittedShowtimeIds.has(showtimeId)).map((showtimeId) => api.delete(`/admin/showtimes/${showtimeId}`)));
+      await Promise.all(showtimeForms.map((showtime) => {
+        const payload = { date: showtime.date, time: showtime.time, roomId: Number(showtime.roomId), movieId };
+        return showtime.showtimeId ? api.put(`/admin/showtimes/${showtime.showtimeId}`, payload) : api.post("/admin/showtimes", payload);
+      }));
       await loadMovies();
       closeForm();
     } catch {
@@ -193,6 +260,7 @@ const MoviesPage = () => {
               <div className="modal-field"><label htmlFor="movie-rating">Rating</label><input id="movie-rating" type="number" min="0" max="10" step="0.1" value={form.rating} onChange={(event) => setForm({ ...form, rating: Number(event.target.value) })} required /></div>
               <div className="modal-field"><label htmlFor="movie-image">Poster image</label><input id="movie-image" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setImageFile(event.target.files?.[0] ?? null)} /><small className="field-help">JPG, PNG, or WebP, up to 5 MB.</small></div>
               <div className="modal-field"><label htmlFor="movie-description">Description</label><textarea id="movie-description" rows={4} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} required /></div>
+              <div className="showtime-form-section"><div className="showtime-form-head"><label>Showtimes</label><button className="btn-sm" type="button" onClick={addShowtime}>+ Add showtime</button></div>{showtimeForms.length === 0 && <small className="field-help">Add a date, cinema, room, and time for this movie.</small>}{showtimeForms.map((showtime, index) => <div className="showtime-form-row" key={showtime.showtimeId ?? `new-${index}`}><div className="modal-field"><label htmlFor={`showtime-date-${index}`}>Date</label><input id={`showtime-date-${index}`} type="date" value={showtime.date} onChange={(event) => updateShowtime(index, { date: event.target.value })} required /></div><div className="modal-field"><label htmlFor={`showtime-cinema-${index}`}>Cinema</label><select id={`showtime-cinema-${index}`} value={showtime.cinemaId} onChange={(event) => updateShowtime(index, { cinemaId: event.target.value, roomId: "" })} required><option value="">Select cinema</option>{cinemas.map((cinema) => <option value={cinema.cinemaId} key={cinema.cinemaId}>{cinema.name} · {cinema.location}</option>)}</select></div><div className="modal-field"><label htmlFor={`showtime-room-${index}`}>Room</label><select id={`showtime-room-${index}`} value={showtime.roomId} onChange={(event) => updateShowtime(index, { roomId: event.target.value })} required disabled={!showtime.cinemaId}><option value="">Select room</option>{rooms.filter((room) => String(room.cinemaId) === showtime.cinemaId).map((room) => <option value={room.roomId} key={room.roomId}>{room.name}</option>)}</select></div><div className="modal-field"><label htmlFor={`showtime-time-${index}`}>Time</label><input id={`showtime-time-${index}`} type="time" value={showtime.time} onChange={(event) => updateShowtime(index, { time: event.target.value })} required /></div><button className="showtime-remove" type="button" aria-label={`Remove showtime ${index + 1}`} onClick={() => removeShowtime(index)}>×</button></div>)}</div>
               <div className="modal-actions"><button className="btn-secondary" type="button" onClick={closeForm}>Cancel</button><button className="btn-primary" type="submit" disabled={saving}>{saving ? "Saving..." : editingMovie ? "Save changes" : "Create movie"}</button></div>
             </form>
           </div>
