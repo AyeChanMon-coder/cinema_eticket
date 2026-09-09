@@ -96,12 +96,25 @@ a {
 .now-showing-title { margin: 12px 0 18px; text-align: center; font-size: clamp(1.4rem, 3vw, 2rem); }
 .public-movie-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 18px; }
 .public-movie-card { min-width: 0; text-align: center; }
-.public-poster { aspect-ratio: 1.35 / 1; display: grid; place-items: center; overflow: hidden; background: #ddd; color: #777; }
-.public-poster img { width: 100%; height: 100%; object-fit: cover; }
+.public-poster { width: 100%; aspect-ratio: 1.35 / 1; display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; background: #ddd; color: #777; cursor: pointer; }
+.public-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s ease; }
+.public-poster:hover img, .public-poster:focus-visible img { transform: scale(1.08); }
+.public-poster:focus-visible { outline: 2px solid #20202a; outline-offset: 3px; }
 .public-movie-card strong, .public-movie-card small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .public-movie-card strong { margin-top: 7px; font-size: 12px; }
 .public-movie-card small { margin-top: 3px; color: #777; font-size: 10px; }
-.public-movie-card button { margin-top: 5px; border: 0; background: #ddd; padding: 3px 11px; font-size: 10px; cursor: pointer; }
+.movie-detail-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: rgba(17, 17, 17, 0.48); backdrop-filter: blur(7px); }
+.movie-detail-modal { position: relative; display: grid; grid-template-columns: 1fr; width: min(100%, 480px); overflow: hidden; background: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); }
+.movie-detail-close { position: absolute; top: 10px; right: 12px; z-index: 1; border: 0; background: rgba(255, 255, 255, 0.84); color: #333; font-size: 24px; line-height: 1; cursor: pointer; }
+.movie-detail-poster { height: 220px; display: grid; place-items: center; background: #f1f1f1; color: #777; }
+.movie-detail-poster img { width: auto; max-width: 170px; height: 200px; object-fit: contain; }
+.movie-detail-copy { padding: 24px 28px 28px; }
+.movie-detail-kicker { margin: 0 0 8px; color: #826b6b; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.movie-detail-copy h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 2rem); }
+.movie-detail-meta { margin: 9px 0 18px; color: #777; font-size: 11px; }
+.movie-detail-description { color: #444; font-size: 13px; line-height: 1.7; }
+.movie-detail-book { margin-top: 14px; border: 0; padding: 10px 18px; background: #20202a; color: #fff; font-size: 12px; cursor: pointer; }
+.movie-detail-book:hover { background: #826b6b; }
 .catalog-state { padding: 28px; text-align: center; color: #777; }
 .catalog-dots { display: flex; justify-content: center; gap: 4px; margin-top: 42px; }
 .catalog-dots span { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
@@ -112,6 +125,9 @@ a {
   .catalog-nav span { display: none; }
   .catalog-content { padding-right: 16px; padding-left: 16px; }
   .public-movie-grid { grid-template-columns: repeat(2, 1fr); gap: 22px 12px; }
+  .movie-detail-poster { height: 180px; }
+  .movie-detail-poster img { max-width: 135px; height: 165px; }
+  .movie-detail-copy { padding: 24px; }
 }
 
 .login-panel form {

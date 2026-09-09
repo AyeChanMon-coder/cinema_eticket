@@ -18,6 +18,7 @@ const UserHome = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const logout = () => {
     localStorage.removeItem("user_token");
@@ -37,6 +38,21 @@ const UserHome = () => {
     void loadMovies();
   }, []);
 
+  useEffect(() => {
+    if (!selectedMovie) return undefined;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedMovie(null);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [selectedMovie]);
+
   const filteredMovies = useMemo(() => movies.filter((movie) =>
     `${movie.title} ${movie.genre}`.toLowerCase().includes(search.toLowerCase()),
   ), [movies, search]);
@@ -50,10 +66,11 @@ const UserHome = () => {
       <section className="catalog-content">
         <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>▤</button></div>
         <h1 className="now-showing-title">Now Showing</h1>
-        {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{filteredMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><div className="public-poster">{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</div><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small><button type="button" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>More</button></article>)}</div>}
+        {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{filteredMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><button className="public-poster" type="button" aria-label={`View details for ${movie.title}`} onClick={() => setSelectedMovie(movie)}>{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</button><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small></article>)}</div>}
         {!loading && filteredMovies.length === 0 && <p className="catalog-state">No movies found.</p>}
         <div className="catalog-dots"><span className="active" /><span /><span /></div>
       </section>
+      {selectedMovie && <div className="movie-detail-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedMovie(null); }}><section className="movie-detail-modal" role="dialog" aria-modal="true" aria-labelledby="movie-detail-title"><button className="movie-detail-close" type="button" aria-label="Close movie details" onClick={() => setSelectedMovie(null)}>×</button><div className="movie-detail-poster">{selectedMovie.image ? <img src={`${window.location.origin}/storage/${selectedMovie.image}`} alt={selectedMovie.title} /> : <span>No poster</span>}</div><div className="movie-detail-copy"><p className="movie-detail-kicker">Now showing</p><h2 id="movie-detail-title">{selectedMovie.title}</h2><p className="movie-detail-meta">{selectedMovie.genre} · {selectedMovie.duration} min · Rating {selectedMovie.rating}</p><p className="movie-detail-description">{selectedMovie.description}</p><button className="movie-detail-book" type="button" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>Book now</button></div></section></div>}
     </main>
   );
 };
