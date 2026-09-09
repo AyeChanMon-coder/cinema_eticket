@@ -12,6 +12,7 @@ const menuItems = [
 const AdminLayout = () => {
   const navigate = useNavigate();
   const userType = localStorage.getItem("admin_user_type");
+  const isSuperadmin = userType === "3";
 
   const logout = () => {
     localStorage.removeItem("admin_token");
@@ -28,16 +29,7 @@ const AdminLayout = () => {
           <span className="sidebar-title">Cinema Admin</span>
         </div>
         <nav className="sidebar-nav" aria-label="Admin navigation">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}
-            >
-              <span className="sidebar-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          {menuItems.map((item) => <NavLink key={item.path} to={item.label === "Users" ? (isSuperadmin ? "/admin/users?type=admins" : "/admin/users?type=users") : item.path} className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}><span className="sidebar-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}
         </nav>
         <button className="sidebar-logout" type="button" onClick={logout}>
           <span>↪</span> Sign out

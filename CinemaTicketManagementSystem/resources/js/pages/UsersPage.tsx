@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../api/axios";
 
 interface User {
@@ -19,7 +20,9 @@ const ITEMS_PER_PAGE = 5;
 
 const UsersPage = () => {
   const currentUserType = Number(localStorage.getItem("admin_user_type"));
-  const managedUserType = currentUserType === 3 ? 2 : 1;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedType = currentUserType === 3 && searchParams.get("type") === "users" ? 1 : 2;
+  const managedUserType = currentUserType === 3 ? selectedType : 1;
   const managedRole = managedUserType === 2 ? "Admin" : "Customer";
   const emptyForm: UserForm = { name: "", email: "", password: "", userType: managedUserType };
   const [users, setUsers] = useState<User[]>([]);
@@ -34,7 +37,7 @@ const UsersPage = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await api.get("/admin/users");
+      const response = await api.get(`/admin/users?type=${managedUserType === 1 ? "users" : "admins"}`);
       setUsers(Array.isArray(response.data) ? response.data : []);
     } catch {
       setError(`Unable to load ${managedRole.toLowerCase()} users.`);
@@ -46,7 +49,7 @@ const UsersPage = () => {
   useEffect(() => {
     if ([2, 3].includes(currentUserType)) void loadUsers();
     else setLoading(false);
-  }, []);
+  }, [managedUserType]);
 
   const openCreate = () => {
     setEditingUser(null);
@@ -76,8 +79,9 @@ const UsersPage = () => {
     try {
       const data = { ...form };
       if (editingUser && !data.password) delete (data as Partial<UserForm>).password;
-      if (editingUser) await api.put(`/admin/users/${editingUser.userId}`, data);
-      else await api.post("/admin/users", data);
+      const roleQuery = `?type=${managedUserType === 1 ? "users" : "admins"}`;
+      if (editingUser) await api.put(`/admin/users/${editingUser.userId}${roleQuery}`, data);
+      else await api.post(`/admin/users${roleQuery}`, data);
       await loadUsers();
       closeForm();
     } catch {
@@ -90,7 +94,7 @@ const UsersPage = () => {
   const remove = async (user: User) => {
     if (!window.confirm(`Delete ${user.name}?`)) return;
     try {
-      await api.delete(`/admin/users/${user.userId}`);
+      await api.delete(`/admin/users/${user.userId}?type=${managedUserType === 1 ? "users" : "admins"}`);
       setUsers((current) => current.filter((item) => item.userId !== user.userId));
     } catch {
       setError("Unable to delete this user.");
@@ -107,7 +111,8 @@ const UsersPage = () => {
 
   return (
     <div className="page-container">
-      <div className="page-head"><div><p className="eyebrow">Access management</p><h1>Users</h1><p className="page-sub">Manage {managedRole.toLowerCase()} accounts.</p></div><button className="btn-primary" type="button" onClick={openCreate}>+ Add user</button></div>
+      <div className="page-head"><div><p className="eyebrow">Access management</p><h1>{managedRole}s</h1><p className="page-sub">Manage {managedRole.toLowerCase()} accounts.</p></div><button className="btn-primary" type="button" onClick={openCreate}>+ Add {managedRole.toLowerCase()}</button></div>
+      {currentUserType === 3 && <div className="user-role-tabs"><button className={managedUserType === 2 ? "active" : ""} type="button" onClick={() => setSearchParams({ type: "admins" })}>Admins</button><button className={managedUserType === 1 ? "active" : ""} type="button" onClick={() => setSearchParams({ type: "users" })}>Users</button></div>}
       {error && <p className="tbl-state error">{error}</p>}
       <section className="card">
         <div className="tbl-toolbar"><input className="tbl-search" aria-label="Search users" placeholder="Search users..." value={search} onChange={(event) => { setSearch(event.target.value); setCurrentPage(1); }} /><span className="tbl-count">{filteredUsers.length} users</span></div>

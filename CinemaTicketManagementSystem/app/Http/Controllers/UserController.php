@@ -11,7 +11,11 @@ class UserController extends Controller
 {
     private function managedUserType(Request $request): int
     {
-        return (int) $request->user()->userType === 3 ? 2 : 1;
+        if ((int) $request->user()->userType === 3) {
+            return $request->query('type') === 'users' ? 1 : 2;
+        }
+
+        return 1;
     }
 
     private function ensureCanManage(Request $request, User $user): void
@@ -36,9 +40,9 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $users = User::where('userType', $this->managedUserType(request()))
+        $users = User::where('userType', $this->managedUserType($request))
             ->with('bookings.showtime.movie', 'bookings.showtime.room.cinema')
             ->get();
         return response()->json($users);

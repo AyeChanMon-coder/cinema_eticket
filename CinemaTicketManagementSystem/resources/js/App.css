@@ -123,6 +123,9 @@ button { cursor: pointer; }
 }
 .badge-superadmin { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
 .access-card { max-width: 620px; }
+.user-role-tabs { display: flex; gap: 8px; margin: -8px 0 18px; }
+.user-role-tabs button { border: 1px solid #d1d5db; border-radius: 7px; padding: 8px 16px; background: #fff; color: #374151; cursor: pointer; }
+.user-role-tabs button.active, .user-role-tabs button:hover { border-color: #111827; background: #111827; color: #fff; }
 .access-card h1 { margin: 0 0 8px; font-size: 1.6rem; }
 .access-card p:not(.eyebrow) { color: #64748b; }
 .modal-field select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font: inherit; font-size: 0.9rem; }
