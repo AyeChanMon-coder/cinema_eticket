@@ -48,6 +48,7 @@ class MovieController extends Controller
             'description' => 'sometimes|required|string',
             'duration' => 'sometimes|required|integer|min:1',
             'rating' => 'sometimes|required|numeric|min:0|max:10',
+            'remove_image' => 'sometimes|boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -55,6 +56,9 @@ class MovieController extends Controller
                 Storage::disk('public')->delete($movie->image);
             }
             $data['image'] = $request->file('image')->store('movies', 'public');
+        } elseif ($request->boolean('remove_image') && $movie->image) {
+            Storage::disk('public')->delete($movie->image);
+            $data['image'] = null;
         }
 
         $movie->update($data);

@@ -5,12 +5,24 @@ interface Cinema {
   cinemaId: number;
   name: string;
   location: string;
-  rooms?: Array<Record<string, unknown>>;
+  rooms?: Room[];
 }
 
 type CinemaForm = Omit<Cinema, "cinemaId" | "rooms">;
 
+interface Room {
+  roomId: number;
+  name: string;
+  cinemaId: number;
+}
+
+interface RoomForm {
+  roomId?: number;
+  name: string;
+}
+
 const emptyForm: CinemaForm = { name: "", location: "" };
+const emptyRoom: RoomForm = { name: "" };
 const ITEMS_PER_PAGE = 5;
 
 const CinemasPage = () => {
@@ -23,6 +35,7 @@ const CinemasPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [roomForms, setRoomForms] = useState<RoomForm[]>([]);
 
   const loadCinemas = async () => {
     try {
@@ -42,6 +55,7 @@ const CinemasPage = () => {
   const openCreate = () => {
     setEditingCinema(null);
     setForm(emptyForm);
+    setRoomForms([]);
     setIsFormOpen(true);
     setError("");
   };
@@ -49,6 +63,7 @@ const CinemasPage = () => {
   const openEdit = (cinema: Cinema) => {
     setEditingCinema(cinema);
     setForm({ name: cinema.name, location: cinema.location });
+    setRoomForms((cinema.rooms ?? []).map((room) => ({ roomId: room.roomId, name: room.name })));
     setIsFormOpen(true);
     setError("");
   };
@@ -56,8 +71,17 @@ const CinemasPage = () => {
   const closeForm = () => {
     setEditingCinema(null);
     setForm(emptyForm);
+    setRoomForms([]);
     setIsFormOpen(false);
   };
+
+  const updateRoom = (index: number, name: string) => {
+    setRoomForms((current) => current.map((room, roomIndex) => roomIndex === index ? { ...room, name } : room));
+  };
+
+  const addRoom = () => setRoomForms((current) => [...current, { ...emptyRoom }]);
+
+  const removeRoom = (index: number) => setRoomForms((current) => current.filter((_, roomIndex) => roomIndex !== index));
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,11 +89,18 @@ const CinemasPage = () => {
     setError("");
 
     try {
+      let cinemaId = editingCinema?.cinemaId;
       if (editingCinema) {
         await api.put(`/admin/cinemas/${editingCinema.cinemaId}`, form);
       } else {
-        await api.post("/admin/cinemas", form);
+        const response = await api.post("/admin/cinemas", form);
+        cinemaId = response.data.cinemaId;
       }
+      if (!cinemaId) throw new Error("Cinema was not saved.");
+      const originalRoomIds = new Set((editingCinema?.rooms ?? []).map((room) => room.roomId));
+      const submittedRoomIds = new Set(roomForms.filter((room) => room.roomId).map((room) => room.roomId));
+      await Promise.all([...originalRoomIds].filter((roomId) => !submittedRoomIds.has(roomId)).map((roomId) => api.delete(`/admin/rooms/${roomId}`)));
+      await Promise.all(roomForms.map((room) => room.roomId ? api.put(`/admin/rooms/${room.roomId}`, { name: room.name, cinemaId }) : api.post("/admin/rooms", { name: room.name, cinemaId })));
       await loadCinemas();
       closeForm();
     } catch {
@@ -152,6 +183,7 @@ const CinemasPage = () => {
             <form onSubmit={submit}>
               <div className="modal-field"><label htmlFor="cinema-name">Cinema name</label><input id="cinema-name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="e.g. Mega Cineplex" required /></div>
               <div className="modal-field"><label htmlFor="cinema-location">Location</label><input id="cinema-location" value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="e.g. Yangon" required /></div>
+              <div className="room-form-section"><div className="room-form-head"><label>Rooms</label><button className="btn-sm" type="button" onClick={addRoom}>+ Add room</button></div>{roomForms.length === 0 && <small className="field-help">Add the rooms available at this cinema.</small>}{roomForms.map((room, index) => <div className="room-form-row" key={room.roomId ?? `new-${index}`}><input aria-label={`Room ${index + 1} name`} value={room.name} onChange={(event) => updateRoom(index, event.target.value)} placeholder={`Room ${index + 1} name`} required /><button className="room-remove" type="button" aria-label={`Remove room ${index + 1}`} onClick={() => removeRoom(index)}>×</button></div>)}</div>
               <div className="modal-actions"><button className="btn-secondary" type="button" onClick={closeForm}>Cancel</button><button className="btn-primary" type="submit" disabled={saving}>{saving ? "Saving..." : editingCinema ? "Save changes" : "Create cinema"}</button></div>
             </form>
           </div>
