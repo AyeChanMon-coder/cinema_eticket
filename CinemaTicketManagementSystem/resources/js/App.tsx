@@ -15,6 +15,8 @@ import UserBooking from "./pages/UserBooking";
 import SeatSelection from "./pages/SeatSelection";
 import BookingDetail from "./pages/BookingDetail";
 import SeatsPage from "./pages/SeatsPage";
+import PaymentsPage from "./pages/PaymentsPage";
+import PaymentMethodsPage from "./pages/PaymentMethodsPage";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="/admin/cinemas" element={<CinemasPage />} />
             <Route path="/admin/seats" element={<SeatsPage />} />
             <Route path="/admin/bookings" element={<Dashboard />} />
+            <Route path="/admin/payments" element={<PaymentsPage />} />
+            <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
             <Route path="/admin/reports" element={<Dashboard />} />
           </Route>

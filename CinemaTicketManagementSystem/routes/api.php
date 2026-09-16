@@ -6,11 +6,13 @@ use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\ShowtimeController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsSuperadmin;
 use Illuminate\Support\Facades\Route;
 
 // Public API Routes
@@ -46,7 +48,11 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::apiResource('showtimes', ShowtimeController::class);
     Route::apiResource('seats', SeatController::class);
     Route::apiResource('bookings', BookingController::class);
-    Route::apiResource('payments', PaymentController::class);
+    Route::get('/payments', [PaymentController::class, 'index']);
+    Route::get('/payments/{payment}', [PaymentController::class, 'show']);
+    Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
+    Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->middleware(IsSuperadmin::class);
+    Route::delete('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->middleware(IsSuperadmin::class);
     Route::apiResource('invoices', InvoiceController::class);
     Route::apiResource('users', UserController::class);
 });

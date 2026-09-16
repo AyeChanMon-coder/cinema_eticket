@@ -189,6 +189,10 @@ a {
 .detail-payment strong { font-size: 13px; }
 .detail-checkout { width: 100%; margin-top: 14px; border: 0; border-radius: 3px; padding: 12px; background: #999; color: #fff; font-size: 13px; cursor: pointer; }
 .detail-checkout:hover { background: #20202a; }
+.payment-readonly-note { margin: -12px 0 20px; color: #64748b; font-size: 0.85rem; }
+.payment-status-pending { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.payment-status-approved { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.payment-status-rejected { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
 
 @media (max-width: 650px) {
   .catalog-header { min-height: 58px; padding: 0 16px; }
