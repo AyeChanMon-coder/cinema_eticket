@@ -13,6 +13,7 @@ import UserHome from "./pages/UserHome";
 import UserEntryRoute from "./components/UserEntryRoute";
 import UserBooking from "./pages/UserBooking";
 import SeatSelection from "./pages/SeatSelection";
+import BookingDetail from "./pages/BookingDetail";
 import SeatsPage from "./pages/SeatsPage";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         </Route>
         <Route path="/user/booking" element={<UserBooking />} />
         <Route path="/user/booking/seats" element={<SeatSelection />} />
+        <Route path="/user/booking/detail" element={<BookingDetail />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>

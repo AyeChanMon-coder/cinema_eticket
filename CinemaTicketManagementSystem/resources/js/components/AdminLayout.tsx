@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const menuItems = [
@@ -14,6 +15,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const userType = localStorage.getItem("admin_user_type");
   const isSuperadmin = userType === "3";
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const logout = () => {
     localStorage.removeItem("admin_token");
@@ -21,6 +23,15 @@ const AdminLayout = () => {
     localStorage.removeItem("admin_user_id");
     navigate("/admin/login", { replace: true });
   };
+
+  useEffect(() => {
+    if (!profileOpen) return undefined;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setProfileOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [profileOpen]);
 
   return (
     <div className="admin-layout">
@@ -45,7 +56,10 @@ const AdminLayout = () => {
           </div>
           <div className="header-right">
             <span className="role-badge">{userType === "3" ? "Superadmin" : "Admin"}</span>
-            <div className="avatar">A</div>
+            <div className="admin-profile-menu">
+              <button className="avatar" type="button" aria-label="Open admin profile menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}>A</button>
+              {profileOpen && <div className="admin-profile-dropdown"><button type="button" onClick={() => setProfileOpen(false)}>Profile</button><button type="button" onClick={() => setProfileOpen(false)}>Settings</button><button type="button" onClick={logout}>Sign out</button></div>}
+            </div>
           </div>
         </header>
         <main className="main-content">

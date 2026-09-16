@@ -42,7 +42,13 @@ button { cursor: pointer; }
 .header-kicker { margin: 0 0 2px; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; }
 .header-right { display: flex; align-items: center; gap: 12px; }
 .role-badge { padding: 6px 10px; border-radius: 999px; background: #fff7ed; color: #c2410c; font-size: 0.75rem; font-weight: 700; }
-.avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #1e293b; color: #fff; font-weight: 700; }
+.admin-profile-menu { position: relative; }
+.avatar { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #1e293b; color: #fff; font-weight: 700; cursor: pointer; }
+.avatar:hover { background: #374151; }
+.admin-profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 60; width: 150px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
+.admin-profile-dropdown button { display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 5px; background: transparent; color: #1f2937; text-align: left; cursor: pointer; font: inherit; font-size: 0.85rem; }
+.admin-profile-dropdown button:hover { background: #f3f4f6; }
+.admin-profile-dropdown button:last-child { color: #b91c1c; }
 .logout-btn {
   border: none; border-radius: 8px; padding: 10px 16px; background: #111827;
   color: white; font-weight: 600; transition: background 0.15s;
