@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('payment_methods')) {
+            return;
+        }
+
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id('paymentMethodId');
             $table->string('code')->unique();
@@ -16,7 +20,7 @@ return new class extends Migration
             $table->string('accountNumber')->nullable();
             $table->string('qrCodeUrl')->nullable();
             $table->boolean('isActive')->default(true);
-            $table->unsignedInteger('sortOrder')->default(0);
+            $table->unsignedInteger('sortOrder')->nullable();
             $table->timestamps();
         });
     }

@@ -14,7 +14,7 @@ class PaymentMethod extends Model
         'name',
         'accountName',
         'accountNumber',
-        'qrCodeUrl',
+        'qrCodeImagePath',
         'isActive',
         'sortOrder',
     ];
@@ -23,6 +23,17 @@ class PaymentMethod extends Model
         'isActive' => 'boolean',
         'sortOrder' => 'integer',
     ];
+
+    protected $hidden = ['qrCodeImagePath'];
+
+    protected $appends = ['qrCodeImageUrl'];
+
+    public function getQrCodeImageUrlAttribute(): ?string
+    {
+        return $this->qrCodeImagePath
+            ? '/storage/' . ltrim($this->qrCodeImagePath, '/')
+            : null;
+    }
 
     public function payments(): HasMany
     {

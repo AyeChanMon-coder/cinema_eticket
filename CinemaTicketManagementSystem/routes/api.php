@@ -52,6 +52,7 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::get('/payments/{payment}', [PaymentController::class, 'show']);
     Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
     Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->middleware(IsSuperadmin::class);
+    Route::patch('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update'])->middleware(IsSuperadmin::class);
     Route::delete('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->middleware(IsSuperadmin::class);
     Route::apiResource('invoices', InvoiceController::class);
     Route::apiResource('users', UserController::class);
