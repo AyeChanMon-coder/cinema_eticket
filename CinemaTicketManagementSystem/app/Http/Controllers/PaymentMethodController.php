@@ -16,6 +16,13 @@ class PaymentMethodController extends Controller
         );
     }
 
+    public function publicIndex(): JsonResponse
+    {
+        return response()->json(
+            PaymentMethod::where('isActive', true)->orderBy('sortOrder')->orderBy('name')->get()
+        );
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

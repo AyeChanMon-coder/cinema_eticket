@@ -12,6 +12,15 @@ interface Movie {
   rating: number;
 }
 
+interface UserNotification {
+  notificationId: number;
+  paymentId?: number | null;
+  title: string;
+  message: string;
+  isRead: boolean;
+  created_at: string;
+}
+
 const UserHome = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -21,6 +30,8 @@ const UserHome = () => {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [notifications, setNotifications] = useState<UserNotification[]>([]);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const logout = () => {
     localStorage.removeItem("user_token");
@@ -39,6 +50,36 @@ const UserHome = () => {
     };
     void loadMovies();
   }, []);
+
+  useEffect(() => {
+    if (!localStorage.getItem("user_token")) return undefined;
+
+    const loadNotifications = async () => {
+      try {
+        const response = await api.get("/notifications");
+        setNotifications(Array.isArray(response.data) ? response.data : []);
+      } catch {
+        // Notifications are optional and should not block movie browsing.
+      }
+    };
+
+    void loadNotifications();
+    const timer = window.setInterval(() => void loadNotifications(), 5000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const openNotification = async (notification: UserNotification) => {
+    try {
+      if (!notification.isRead) {
+        await api.patch(`/notifications/${notification.notificationId}/read`);
+        setNotifications((current) => current.map((item) => item.notificationId === notification.notificationId ? { ...item, isRead: true } : item));
+      }
+    } finally {
+      setNotificationsOpen(false);
+      setProfileOpen(false);
+      if (notification.paymentId) navigate("/user/booking/payment", { state: { paymentId: notification.paymentId } });
+    }
+  };
 
   useEffect(() => {
     if (!selectedMovie) return undefined;
@@ -73,10 +114,10 @@ const UserHome = () => {
     <main className="catalog-home">
       <header className="catalog-header">
         <Link className="catalog-brand" to="/"><img src="/cinema-logo.svg" alt="Cinema" /></Link>
-        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src="/default-user.svg" alt="User profile" /></button>{profileOpen && <div className="profile-dropdown"><button type="button" onClick={() => setProfileOpen(false)}>Profile</button><button type="button" onClick={() => setProfileOpen(false)}>Settings</button><button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
+        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src="/default-user.svg" alt="User profile" />{notifications.some((notification) => !notification.isRead) && <b className="profile-notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{profileOpen && <div className="profile-dropdown"><button type="button" onClick={() => setProfileOpen(false)}>Profile</button><button type="button" onClick={() => setProfileOpen(false)}>Settings</button><button className="profile-notifications-toggle" type="button" onClick={() => setNotificationsOpen((open) => !open)}><span>Notifications</span>{notifications.some((notification) => !notification.isRead) && <b className="notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{notificationsOpen && <div className="profile-notifications"><div className="notification-dropdown-head"><strong>Notifications</strong>{!notifications.length && <small>No notifications</small>}</div>{notifications.map((notification) => <button className={`notification-item${notification.isRead ? "" : " unread"}`} type="button" key={notification.notificationId} onClick={() => void openNotification(notification)}><strong>{notification.title}</strong><span>{notification.message}</span></button>)}</div>}<button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
       </header>
       <section className="catalog-content">
-        <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate("/user/login", { state: { userEntry: true } })}>▤</button></div>
+        <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate(localStorage.getItem("user_token") ? "/user/bookings" : "/user/login", { state: localStorage.getItem("user_token") ? undefined : { userEntry: true } })}>▤</button></div>
         <h1 className="now-showing-title">Now Showing</h1>
         {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{paginatedMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><button className="public-poster" type="button" aria-label={`View details for ${movie.title}`} onClick={() => { setSelectedMovie(movie); setDescriptionExpanded(false); }}>{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</button><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small></article>)}</div>}
         {!loading && filteredMovies.length === 0 && <p className="catalog-state">No movies found.</p>}

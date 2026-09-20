@@ -20,6 +20,11 @@ class Payment extends Model
         'bookingId',
     ];
 
+    public function getPaymentSlipUrlAttribute(?string $path): ?string
+    {
+        return $path ? '/storage/' . ltrim($path, '/') : null;
+    }
+
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class, 'bookingId', 'bookingId');

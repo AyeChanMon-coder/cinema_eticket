@@ -14,6 +14,9 @@ import UserEntryRoute from "./components/UserEntryRoute";
 import UserBooking from "./pages/UserBooking";
 import SeatSelection from "./pages/SeatSelection";
 import BookingDetail from "./pages/BookingDetail";
+import PaymentInformation from "./pages/PaymentInformation";
+import TicketPage from "./pages/TicketPage";
+import UserBookings from "./pages/UserBookings";
 import SeatsPage from "./pages/SeatsPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import PaymentMethodsPage from "./pages/PaymentMethodsPage";
@@ -30,6 +33,9 @@ function App() {
         <Route path="/user/booking" element={<UserBooking />} />
         <Route path="/user/booking/seats" element={<SeatSelection />} />
         <Route path="/user/booking/detail" element={<BookingDetail />} />
+        <Route path="/user/booking/payment" element={<PaymentInformation />} />
+        <Route path="/user/booking/payment/ticket" element={<TicketPage />} />
+        <Route path="/user/bookings" element={<UserBookings />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>

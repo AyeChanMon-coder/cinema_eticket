@@ -15,6 +15,16 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
+    public function customerIndex(Request $request): JsonResponse
+    {
+        return response()->json(
+            Booking::where('userId', $request->user()->userId)
+                ->with(['showtime.movie', 'showtime.room.cinema', 'seats', 'payment.paymentMethod'])
+                ->latest('bookingId')
+                ->get()
+        );
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\RoomController;
@@ -27,12 +28,21 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/showtimes', [ShowtimeController::class, 'index']);
     Route::get('/showtimes/{showtime}', [ShowtimeController::class, 'show']);
 
+    Route::get('/payment-methods', [PaymentMethodController::class, 'publicIndex']);
+
     Route::get('/cinemas', [CinemaController::class, 'index']);
     Route::get('/cinemas/{cinema}', [CinemaController::class, 'show']);
 
     Route::get('/rooms', [RoomController::class, 'index']);
     Route::get('/rooms/{room}', [RoomController::class, 'show']);
     Route::get('/rooms/{room}/seats', [SeatController::class, 'byRoom']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/payments', [PaymentController::class, 'submit']);
+        Route::get('/payments/{payment}/status', [PaymentController::class, 'customerShow']);
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
+        Route::get('/bookings', [BookingController::class, 'customerIndex']);
+    });
 });
 
 Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
@@ -50,6 +60,7 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::apiResource('bookings', BookingController::class);
     Route::get('/payments', [PaymentController::class, 'index']);
     Route::get('/payments/{payment}', [PaymentController::class, 'show']);
+    Route::patch('/payments/{payment}/status', [PaymentController::class, 'updateStatus']);
     Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
     Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->middleware(IsSuperadmin::class);
     Route::patch('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update'])->middleware(IsSuperadmin::class);

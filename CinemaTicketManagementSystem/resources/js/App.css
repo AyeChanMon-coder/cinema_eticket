@@ -163,6 +163,13 @@ button { cursor: pointer; }
 .modal-head h2 { margin: 0; }
 .modal-close { background: none; border: none; font-size: 1.5rem; color: #94a3b8; line-height: 1; }
 .modal-close:hover { color: #374151; }
+.payment-slip-link { border: 0; padding: 0; background: transparent; color: #2563eb; font: inherit; cursor: pointer; }
+.payment-slip-link:hover { text-decoration: underline; }
+.payment-slip-overlay { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(15, 23, 42, .72); }
+.payment-slip-modal { width: min(720px, 95vw); max-height: 90vh; overflow: auto; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, .3); }
+.payment-slip-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.payment-slip-modal-head h2 { margin: 0; font-size: 1.1rem; }
+.payment-slip-image { display: block; width: 100%; max-height: calc(90vh - 100px); object-fit: contain; background: #f8fafc; }
 .modal-field { margin-bottom: 14px; }
 .modal-field label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; color: #374151; }
 .modal-field input {
