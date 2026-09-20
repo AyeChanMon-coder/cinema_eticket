@@ -76,10 +76,11 @@ a {
 .catalog-nav a, .catalog-actions a { padding: 5px 8px; border-radius: 4px; color: #111; }
 .catalog-nav a:hover, .catalog-actions a:hover { background: #f1f1f1; }
 .catalog-nav button, .catalog-actions button { border: 0; background: transparent; font: inherit; cursor: pointer; }
-.user-menu { position: relative; }
+.user-menu { position: relative; display: flex; align-items: center; gap: 10px; }
 .profile-button { position: relative; width: 42px; height: 42px; padding: 0 !important; border-radius: 50%; overflow: visible; }
-.profile-button img { display: block; width: 100%; height: 100%; }
+.profile-button img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .profile-notification-count { position: absolute; top: -5px; right: -7px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border: 2px solid #fff; border-radius: 10px; background: #b91c1c; color: #fff; font-size: 9px; line-height: 1; }
+.profile-display-name { max-width: 130px; overflow: hidden; color: #111; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 20; width: 250px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
 .profile-dropdown button { display: block; width: 100%; padding: 10px 12px !important; border-radius: 5px; text-align: left; color: #1f2937; }
 .profile-dropdown button:hover { background: #f3f4f6; }
@@ -107,6 +108,23 @@ a {
 .notification-item:hover, .notification-item.unread { background: #f7f7f7; }
 .notification-item strong { font-size: 11px; }
 .notification-item span { color: #666; font-size: 10px; line-height: 1.4; }
+.profile-modal-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(17, 17, 17, .62); }
+.profile-modal { position: relative; width: min(100%, 440px); max-height: calc(100vh - 40px); overflow-y: auto; padding: 28px; border-radius: 8px; background: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, .28); }
+.profile-modal h2 { margin: 0 0 22px; color: #222; font-size: 22px; }
+.profile-modal-close { position: absolute; top: 12px; right: 15px; border: 0; background: transparent; color: #555; font-size: 24px; line-height: 1; cursor: pointer; }
+.profile-image-field { display: grid; justify-items: center; gap: 8px; margin-bottom: 22px; }
+.profile-image-field img { width: 82px; height: 82px; border-radius: 50%; object-fit: cover; }
+.profile-image-field label { padding: 7px 12px; border-radius: 4px; background: #20202a; color: #fff; font-size: 12px; cursor: pointer; }
+.profile-image-field input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.profile-image-field small { max-width: 100%; overflow: hidden; color: #777; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.profile-field { display: grid; gap: 6px; margin-top: 14px; color: #555; font-size: 12px; }
+.profile-field input { width: 100%; box-sizing: border-box; padding: 10px 11px; border: 1px solid #d1d5db; border-radius: 4px; color: #111; font: inherit; outline: none; }
+.profile-field input:focus { border-color: #20202a; }
+.profile-error { margin: 14px 0 0; color: #b91c1c; font-size: 11px; }
+.profile-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.profile-modal-actions button { padding: 10px 16px; border: 1px solid #c8c8c8; border-radius: 4px; background: #fff; color: #555; font-size: 12px; cursor: pointer; }
+.profile-modal-actions button:last-child { border-color: #20202a; background: #20202a; color: #fff; }
+.profile-modal-actions button:disabled { cursor: wait; opacity: .6; }
 .now-showing-title { margin: 12px 0 18px; text-align: center; font-size: clamp(1.4rem, 3vw, 2rem); }
 .public-movie-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 18px; }
 .public-movie-card { min-width: 0; text-align: center; }

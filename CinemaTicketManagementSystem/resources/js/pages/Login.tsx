@@ -14,6 +14,8 @@ const Login: React.FC = () => {
     
     try {
       const response = await api.post("/admin/login", { email, password });
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user_id");
       localStorage.setItem("admin_token", response.data.access_token);
       localStorage.setItem("admin_user_id", String(response.data.userId));
       localStorage.setItem("admin_user_type", String(response.data.userType));

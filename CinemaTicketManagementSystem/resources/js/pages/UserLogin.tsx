@@ -14,6 +14,9 @@ const UserLogin = () => {
     setError("");
     try {
       const response = await api.post("/user/login", { email, password });
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user_id");
+      localStorage.removeItem("admin_user_type");
       localStorage.setItem("user_token", response.data.access_token);
       localStorage.setItem("user_id", String(response.data.userId));
       const bookingMovie = (location.state as { bookingMovie?: unknown } | null)?.bookingMovie;
