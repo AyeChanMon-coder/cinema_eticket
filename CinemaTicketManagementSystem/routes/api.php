@@ -42,6 +42,7 @@ Route::middleware('throttle:60,1')->group(function () {
         Route::get('/payments/{payment}/status', [PaymentController::class, 'customerShow']);
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::post('/profile', [ProfileController::class, 'update']);
+        Route::post('/profile/password', [ProfileController::class, 'changePassword']);
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
         Route::get('/bookings', [BookingController::class, 'customerIndex']);

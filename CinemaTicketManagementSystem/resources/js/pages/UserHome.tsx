@@ -47,12 +47,25 @@ const UserHome = () => {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState("");
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("user_theme") === "dark" ? "dark" : "light");
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", newPassword_confirmation: "" });
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const logout = () => {
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_id");
     navigate("/", { replace: true });
   };
+
+  useEffect(() => {
+    document.body.classList.toggle("theme-dark", theme === "dark");
+    localStorage.setItem("user_theme", theme);
+  }, [theme]);
+
+  useEffect(() => () => document.body.classList.remove("theme-dark"), []);
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -108,6 +121,32 @@ const UserHome = () => {
     setProfileError("");
     setProfileImage(null);
     setProfileImagePreview(null);
+  };
+
+  const openSettings = () => {
+    setSettingsModalOpen(true);
+    setProfileOpen(false);
+    setNotificationsOpen(false);
+    setPasswordMessage("");
+    setPasswordError("");
+  };
+
+  const changePassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPasswordSaving(true);
+    setPasswordMessage("");
+    setPasswordError("");
+    try {
+      await api.post("/profile/password", passwordForm);
+      setPasswordForm({ currentPassword: "", newPassword: "", newPassword_confirmation: "" });
+      setPasswordMessage("Password changed successfully.");
+    } catch (error: unknown) {
+      const responseData = error instanceof AxiosError ? error.response?.data as { message?: string; errors?: Record<string, string[]> } | undefined : undefined;
+      const validationMessage = responseData?.errors ? Object.values(responseData.errors).flat()[0] : undefined;
+      setPasswordError(validationMessage ?? responseData?.message ?? "Unable to change password.");
+    } finally {
+      setPasswordSaving(false);
+    }
   };
 
   const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +229,7 @@ const UserHome = () => {
     <main className="catalog-home">
       <header className="catalog-header">
         <Link className="catalog-brand" to="/"><img src="/cinema-logo.svg" alt="Cinema" /></Link>
-        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src={profile?.profileImageUrl ? `${window.location.origin}${profile.profileImageUrl}` : "/default-user.svg"} alt="User profile" />{notifications.some((notification) => !notification.isRead) && <b className="profile-notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{profile?.name && <span className="profile-display-name">{profile.name}</span>}{profileOpen && <div className="profile-dropdown"><button type="button" onClick={openProfile}>Profile</button><button type="button" onClick={() => setProfileOpen(false)}>Settings</button><button className="profile-notifications-toggle" type="button" onClick={() => setNotificationsOpen((open) => !open)}><span>Notifications</span>{notifications.some((notification) => !notification.isRead) && <b className="notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{notificationsOpen && <div className="profile-notifications"><div className="notification-dropdown-head"><strong>Notifications</strong>{!notifications.length && <small>No notifications</small>}</div>{notifications.map((notification) => <button className={`notification-item${notification.isRead ? "" : " unread"}`} type="button" key={notification.notificationId} onClick={() => void openNotification(notification)}><strong>{notification.title}</strong><span>{notification.message}</span></button>)}</div>}<button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
+        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src={profile?.profileImageUrl ? `${window.location.origin}${profile.profileImageUrl}` : "/default-user.svg"} alt="User profile" />{notifications.some((notification) => !notification.isRead) && <b className="profile-notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{profile?.name && <span className="profile-display-name">{profile.name}</span>}{profileOpen && <div className="profile-dropdown"><button type="button" onClick={openProfile}>Profile</button><button type="button" onClick={openSettings}>Setting &amp; Privacy</button><button className="profile-notifications-toggle" type="button" onClick={() => setNotificationsOpen((open) => !open)}><span>Notifications</span>{notifications.some((notification) => !notification.isRead) && <b className="notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{notificationsOpen && <div className="profile-notifications"><div className="notification-dropdown-head"><strong>Notifications</strong>{!notifications.length && <small>No notifications</small>}</div>{notifications.map((notification) => <button className={`notification-item${notification.isRead ? "" : " unread"}`} type="button" key={notification.notificationId} onClick={() => void openNotification(notification)}><strong>{notification.title}</strong><span>{notification.message}</span></button>)}</div>}<button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
       </header>
       <section className="catalog-content">
         <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate(localStorage.getItem("user_token") ? "/user/bookings" : "/user/login", { state: localStorage.getItem("user_token") ? undefined : { userEntry: true } })}>▤</button></div>
@@ -199,6 +238,7 @@ const UserHome = () => {
         {!loading && filteredMovies.length === 0 && <p className="catalog-state">No movies found.</p>}
         {!loading && totalPages > 1 && <nav className="movie-pagination" aria-label="Movie pages"><button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => page - 1)}>‹</button>{Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => <button className={page === currentPage ? "active" : ""} type="button" key={page} aria-label={`Page ${page}`} aria-current={page === currentPage ? "page" : undefined} onClick={() => setCurrentPage(page)}>{page}</button>)}<button type="button" aria-label="Next page" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => page + 1)}>›</button></nav>}
       </section>
+      {settingsModalOpen && <div className="profile-modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsModalOpen(false); }}><section className="profile-modal settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title"><button className="profile-modal-close" type="button" aria-label="Close settings" onClick={() => setSettingsModalOpen(false)}>×</button><h2 id="settings-modal-title">Setting &amp; Privacy</h2><section className="settings-section"><h3>Theme</h3><div className="theme-options"><label className={theme === "light" ? "selected" : ""}><input type="radio" name="theme" checked={theme === "light"} onChange={() => setTheme("light")} />Light</label><label className={theme === "dark" ? "selected" : ""}><input type="radio" name="theme" checked={theme === "dark"} onChange={() => setTheme("dark")} />Dark</label></div></section><form className="password-form" onSubmit={changePassword}><h3>Change Password</h3><label className="profile-field">Current password<input type="password" value={passwordForm.currentPassword} onChange={(event) => setPasswordForm({ ...passwordForm, currentPassword: event.target.value })} required /></label><label className="profile-field">New password<input type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} minLength={8} required /></label><label className="profile-field">Confirm new password<input type="password" value={passwordForm.newPassword_confirmation} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword_confirmation: event.target.value })} minLength={8} required /></label>{passwordError && <p className="profile-error">{passwordError}</p>}{passwordMessage && <p className="password-success">{passwordMessage}</p>}<div className="profile-modal-actions"><button type="button" onClick={() => setSettingsModalOpen(false)}>Close</button><button type="submit" disabled={passwordSaving}>{passwordSaving ? "Saving..." : "Change password"}</button></div></form></section></div>}
       {profileModalOpen && <div className="profile-modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setProfileModalOpen(false); }}><section className="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title"><button className="profile-modal-close" type="button" aria-label="Close profile" onClick={() => setProfileModalOpen(false)}>×</button><h2 id="profile-modal-title">Profile</h2><form onSubmit={saveProfile}><div className="profile-image-field"><img src={profileImagePreview ?? (profile?.profileImageUrl ? `${window.location.origin}${profile.profileImageUrl}` : "/default-user.svg")} alt="Profile preview" /><label htmlFor="profile-image-upload">Change image<input id="profile-image-upload" type="file" accept="image/jpeg,image/png,image/webp" onChange={handleProfileImageChange} /></label>{profileImage && <small>{profileImage.name}</small>}</div><label className="profile-field">Name<input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} required /></label><label className="profile-field">Email<input type="email" value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} required /></label><label className="profile-field">Phone<input value={profileForm.phone} onChange={(event) => setProfileForm({ ...profileForm, phone: event.target.value })} placeholder="Enter phone number" /></label>{profileError && <p className="profile-error">{profileError}</p>}<div className="profile-modal-actions"><button type="button" onClick={() => setProfileModalOpen(false)}>Cancel</button><button type="submit" disabled={profileSaving}>{profileSaving ? "Saving..." : "Save changes"}</button></div></form></section></div>}
       {selectedMovie && <div className="movie-detail-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedMovie(null); }}><section className="movie-detail-modal" role="dialog" aria-modal="true" aria-labelledby="movie-detail-title"><button className="movie-detail-close" type="button" aria-label="Close movie details" onClick={() => setSelectedMovie(null)}>×</button><div className="movie-detail-poster">{selectedMovie.image ? <img src={`${window.location.origin}/storage/${selectedMovie.image}`} alt={selectedMovie.title} /> : <span>No poster</span>}</div><div className="movie-detail-copy"><p className="movie-detail-kicker">Now showing</p><h2 id="movie-detail-title">{selectedMovie.title}</h2><p className="movie-detail-meta">{selectedMovie.genre} · {selectedMovie.duration} min · Rating {selectedMovie.rating}</p><p className="movie-detail-description">{descriptionExpanded || selectedMovie.description.length <= 100 ? selectedMovie.description : `${selectedMovie.description.slice(0, 100)}...`}</p>{selectedMovie.description.length > 100 && <button className="movie-detail-more" type="button" onClick={() => setDescriptionExpanded((expanded) => !expanded)}>{descriptionExpanded ? "See less" : "See more"}</button>}<button className="movie-detail-book" type="button" onClick={() => { const userToken = localStorage.getItem("user_token"); navigate(userToken ? "/user/booking" : "/user/login", { state: userToken ? { movie: selectedMovie } : { userEntry: true, bookingMovie: selectedMovie } }); }}>Book now</button></div></section></div>}
     </main>

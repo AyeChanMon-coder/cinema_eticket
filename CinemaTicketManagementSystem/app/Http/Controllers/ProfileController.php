@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -34,5 +35,21 @@ class ProfileController extends Controller
         $user->update($data);
 
         return response()->json($user->fresh());
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'currentPassword' => 'required|string',
+            'newPassword' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($data['currentPassword'], $request->user()->password)) {
+            return response()->json(['message' => 'Current password is incorrect.'], 422);
+        }
+
+        $request->user()->update(['password' => Hash::make($data['newPassword'])]);
+
+        return response()->json(['message' => 'Password changed successfully.']);
     }
 }

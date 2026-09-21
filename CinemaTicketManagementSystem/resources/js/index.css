@@ -125,6 +125,32 @@ a {
 .profile-modal-actions button { padding: 10px 16px; border: 1px solid #c8c8c8; border-radius: 4px; background: #fff; color: #555; font-size: 12px; cursor: pointer; }
 .profile-modal-actions button:last-child { border-color: #20202a; background: #20202a; color: #fff; }
 .profile-modal-actions button:disabled { cursor: wait; opacity: .6; }
+.settings-modal h2 { margin-bottom: 18px; }
+.settings-section { padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+.settings-section h3, .password-form h3 { margin: 0 0 12px; color: #222; font-size: 14px; }
+.theme-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.theme-options label { display: flex; align-items: center; gap: 8px; padding: 11px 12px; border: 1px solid #d1d5db; border-radius: 4px; color: #555; font-size: 12px; cursor: pointer; }
+.theme-options label.selected { border-color: #20202a; background: #f3f4f6; color: #111; }
+.theme-options input { accent-color: #20202a; }
+.password-form { padding-top: 20px; }
+.password-success { margin-top: 14px; color: #047857; font-size: 11px; }
+
+body.theme-dark { background: #111827; color: #e5e7eb; }
+body.theme-dark .catalog-home { background: #111827; color: #f3f4f6; }
+body.theme-dark .catalog-header { border-color: #374151; background: #111827; }
+body.theme-dark .catalog-brand, body.theme-dark .catalog-nav a, body.theme-dark .profile-display-name { color: #f3f4f6; }
+body.theme-dark .movie-search input { background: #1f2937; color: #f3f4f6; }
+body.theme-dark .movie-search > span { color: #cbd5e1; }
+body.theme-dark .profile-dropdown, body.theme-dark .profile-modal { border-color: #374151; background: #1f2937; color: #f3f4f6; }
+body.theme-dark .profile-dropdown button, body.theme-dark .profile-modal h2, body.theme-dark .settings-section h3, body.theme-dark .password-form h3 { color: #f3f4f6; }
+body.theme-dark .profile-dropdown button:hover, body.theme-dark .notification-item:hover, body.theme-dark .notification-item.unread { background: #374151; }
+body.theme-dark .profile-notifications, body.theme-dark .notification-item { border-color: #374151; background: #1f2937; }
+body.theme-dark .notification-item span, body.theme-dark .notification-dropdown-head small, body.theme-dark .profile-field, body.theme-dark .theme-options label { color: #cbd5e1; }
+body.theme-dark .profile-field input { border-color: #4b5563; background: #111827; color: #f3f4f6; }
+body.theme-dark .settings-section { border-color: #374151; }
+body.theme-dark .theme-options label { border-color: #4b5563; }
+body.theme-dark .theme-options label.selected { border-color: #f3f4f6; background: #374151; color: #fff; }
+body.theme-dark .profile-modal-actions button:first-child { border-color: #4b5563; background: #1f2937; color: #e5e7eb; }
 .now-showing-title { margin: 12px 0 18px; text-align: center; font-size: clamp(1.4rem, 3vw, 2rem); }
 .public-movie-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 18px; }
 .public-movie-card { min-width: 0; text-align: center; }
