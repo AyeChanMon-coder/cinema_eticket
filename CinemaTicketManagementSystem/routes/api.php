@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\InvoiceController;
@@ -50,9 +51,7 @@ Route::middleware('throttle:60,1')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return response()->json(['data' => 'Welcome to Secret Admin Dashboard!']);
-    });
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 

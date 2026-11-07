@@ -5,7 +5,7 @@ interface Booking {
   bookingId: number;
   bookingDate: string;
   status: string;
-  user?: { name?: string; email?: string; phone?: string | null };
+  user?: { name?: string; email?: string; phone?: string | null; userType?: number };
   showtime?: {
     date?: string;
     time?: string;
@@ -27,6 +27,8 @@ const bookingTotal = (booking: Booking) => Number(
   ?? booking.seats?.reduce((total, seat) => total + Number(seat.seatPrice ?? 0), 0)
   ?? 0,
 );
+
+const isCustomer = (booking: Booking) => Number(booking.user?.userType) === 1;
 
 const BookingsPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -58,8 +60,8 @@ const BookingsPage = () => {
       const matchesStatus = statusFilter === "all" || booking.status.toLowerCase() === statusFilter;
       const searchableText = [
         booking.bookingId,
-        booking.user?.name,
-        booking.user?.email,
+        isCustomer(booking) ? booking.user?.name : "",
+        isCustomer(booking) ? booking.user?.email : "",
         booking.showtime?.movie?.title,
         booking.showtime?.room?.cinema?.name,
         booking.showtime?.room?.cinema?.location,
@@ -133,7 +135,7 @@ const BookingsPage = () => {
                 {visibleBookings.map((booking) => (
                   <tr key={booking.bookingId}>
                     <td><strong>#{booking.bookingId}</strong><br /><small>{formatDate(booking.bookingDate)}</small></td>
-                    <td><strong>{booking.user?.name ?? "-"}</strong><br /><small>{booking.user?.email ?? ""}</small></td>
+                    <td>{isCustomer(booking) ? <><strong>{booking.user?.name ?? "-"}</strong><br /><small>{booking.user?.email ?? ""}</small></> : "-"}</td>
                     <td><strong>{booking.showtime?.movie?.title ?? "-"}</strong><br /><small>{booking.showtime?.room?.cinema?.name ?? booking.showtime?.room?.cinema?.location ?? "-"}</small></td>
                     <td>{formatDate(booking.showtime?.date)}<br /><small>{booking.showtime?.time?.slice(0, 5) ?? "-"}</small></td>
                     <td>{booking.seats?.map((seat) => seat.seatNumber).join(", ") || "-"}</td>
@@ -166,9 +168,9 @@ const BookingsPage = () => {
             <dl className="booking-detail-grid">
               <div><dt>Booking date</dt><dd>{formatDate(selectedBooking.bookingDate)}</dd></div>
               <div><dt>Booking status</dt><dd>{statusBadge(selectedBooking.status)}</dd></div>
-              <div><dt>Customer</dt><dd>{selectedBooking.user?.name ?? "-"}</dd></div>
-              <div><dt>Email</dt><dd>{selectedBooking.user?.email ?? "-"}</dd></div>
-              <div><dt>Phone</dt><dd>{selectedBooking.user?.phone ?? "-"}</dd></div>
+              <div><dt>Customer</dt><dd>{isCustomer(selectedBooking) ? selectedBooking.user?.name ?? "-" : "-"}</dd></div>
+              <div><dt>Email</dt><dd>{isCustomer(selectedBooking) ? selectedBooking.user?.email ?? "-" : "-"}</dd></div>
+              <div><dt>Phone</dt><dd>{isCustomer(selectedBooking) ? selectedBooking.user?.phone ?? "-" : "-"}</dd></div>
               <div><dt>Movie</dt><dd>{selectedBooking.showtime?.movie?.title ?? "-"}</dd></div>
               <div><dt>Cinema</dt><dd>{selectedBooking.showtime?.room?.cinema?.name ?? "-"}</dd></div>
               <div><dt>Location</dt><dd>{selectedBooking.showtime?.room?.cinema?.location ?? "-"}</dd></div>
