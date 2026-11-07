@@ -44,13 +44,16 @@ class UserController extends Controller
     {
         $users = User::where('userType', $this->managedUserType($request))
             ->with('bookings.showtime.movie', 'bookings.showtime.room.cinema')
+            ->latest('userId')
             ->get();
+
         return response()->json($users);
     }
 
     public function show(User $user): JsonResponse
     {
         $this->ensureCanManage(request(), $user);
+
         return response()->json($user->load('bookings.showtime.movie', 'bookings.showtime.room.cinema'));
     }
 
@@ -59,7 +62,7 @@ class UserController extends Controller
         $this->ensureCanManage($request, $user);
         $data = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->userId . ',userId',
+            'email' => 'sometimes|required|email|unique:users,email,'.$user->userId.',userId',
             'password' => 'sometimes|nullable|string|min:8',
             'userType' => 'sometimes|required|integer|in:1,2',
         ]);
@@ -83,6 +86,7 @@ class UserController extends Controller
     {
         $this->ensureCanManage(request(), $user);
         $user->delete();
+
         return response()->json(null, 204);
     }
 }

@@ -11,7 +11,7 @@ class MovieController extends Controller
 {
     public function index(): JsonResponse
     {
-        $movies = Movie::with('showtimes.room.cinema')->get();
+        $movies = Movie::with('showtimes.room.cinema')->latest('movieId')->get();
 
         return response()->json($movies);
     }

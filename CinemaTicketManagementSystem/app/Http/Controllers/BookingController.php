@@ -14,7 +14,9 @@ class BookingController extends Controller
     public function index(SeatHoldService $seatHoldService): JsonResponse
     {
         $seatHoldService->expireOverdue();
-        $bookings = Booking::with(['user', 'showtime.movie', 'showtime.room.cinema', 'seats', 'payment'])->get();
+        $bookings = Booking::with(['user', 'showtime.movie', 'showtime.room.cinema', 'seats', 'payment'])
+            ->latest('bookingId')
+            ->get();
 
         return response()->json($bookings);
     }
@@ -28,6 +30,40 @@ class BookingController extends Controller
                 ->with(['showtime.movie', 'showtime.room.cinema', 'seats', 'payment.paymentMethod'])
                 ->latest('bookingId')
                 ->get()
+        );
+    }
+
+    public function hold(Request $request, SeatHoldService $seatHoldService): JsonResponse
+    {
+        abort_unless((int) $request->user()->userType === 1, 403);
+
+        $data = $request->validate([
+            'showtimeId' => 'required|exists:showtimes,showtimeId',
+            'seatIds' => 'required|array|min:1',
+            'seatIds.*' => 'required|integer|distinct|exists:seats,seatId',
+        ]);
+
+        $seatHoldService->expireOverdue();
+        $booking = DB::transaction(function () use ($data, $request, $seatHoldService) {
+            $showtime = Showtime::whereKey($data['showtimeId'])->lockForUpdate()->firstOrFail();
+            abort_unless($showtime->isUpcoming(), 422, 'This showtime has already started.');
+            $seatHoldService->lockAndAssertAvailable($showtime, $data['seatIds']);
+
+            $booking = Booking::create([
+                'bookingDate' => now()->toDateString(),
+                'status' => 'pending',
+                'userId' => $request->user()->userId,
+                'showtimeId' => $showtime->showtimeId,
+                'holdExpiresAt' => now()->addMinutes(15),
+            ]);
+            $booking->seats()->attach($data['seatIds']);
+
+            return $booking;
+        });
+
+        return response()->json(
+            $booking->load(['showtime.movie', 'seats']),
+            201
         );
     }
 

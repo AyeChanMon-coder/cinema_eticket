@@ -26,8 +26,13 @@ class Booking extends Model
             $query->where('status', 'confirmed')
                 ->orWhere(function (Builder $query) {
                     $query->where('status', 'pending')
-                        ->where('holdExpiresAt', '>', now())
-                        ->whereDoesntHave('payment', fn (Builder $query) => $query->whereIn('paymentStatus', ['rejected', 'expired', 'cancelled']));
+                        ->where(function (Builder $query) {
+                            $query->whereHas('payment', fn (Builder $query) => $query->where('paymentStatus', 'pending'))
+                                ->orWhere(function (Builder $query) {
+                                    $query->where('holdExpiresAt', '>', now())
+                                        ->whereDoesntHave('payment', fn (Builder $query) => $query->whereIn('paymentStatus', ['rejected', 'expired', 'cancelled']));
+                                });
+                        });
                 });
         });
     }

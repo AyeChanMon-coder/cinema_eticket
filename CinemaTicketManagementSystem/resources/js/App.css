@@ -46,6 +46,10 @@ button { cursor: pointer; }
 .header-greeting { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 0; }
 .header-kicker { margin: 0 0 2px; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; }
 .header-right { display: flex; align-items: center; gap: 12px; }
+.header-right .notification-menu { order: initial; }
+.header-right .profile-notifications { position: absolute; top: calc(100% + 10px); right: 0; z-index: 100; width: min(360px, calc(100vw - 32px)); max-height: min(70vh, 420px); margin: 0; overflow-y: auto; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
+.notification-empty, .notification-error { margin: 0; padding: 14px; color: #666; font-size: 0.8rem; }
+.notification-error { color: #b91c1c; }
 .role-badge { padding: 6px 10px; border-radius: 999px; background: #fff7ed; color: #c2410c; font-size: 0.75rem; font-weight: 700; }
 .admin-profile-menu { position: relative; }
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #1e293b; color: #fff; font-weight: 700; cursor: pointer; }

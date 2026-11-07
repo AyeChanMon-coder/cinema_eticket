@@ -23,6 +23,8 @@ interface BookingDetailState {
   movie?: Movie;
   showtime?: Showtime;
   selectedSeats?: Seat[];
+  bookingId?: number;
+  holdExpiresAt?: string;
 }
 
 interface PaymentMethod {
@@ -46,10 +48,19 @@ const formatPrice = (price: number) => `${price.toFixed(2)} MMK`;
 const BookingDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { movie, showtime, selectedSeats } = (location.state as BookingDetailState | null) ?? {};
+  const { movie, showtime, selectedSeats, bookingId, holdExpiresAt } = (location.state as BookingDetailState | null) ?? {};
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<number | null>(null);
   const [paymentError, setPaymentError] = useState("");
+  const [holdSecondsLeft, setHoldSecondsLeft] = useState(() => holdExpiresAt ? Math.max(0, Math.ceil((new Date(holdExpiresAt).getTime() - Date.now()) / 1000)) : 0);
+
+  useEffect(() => {
+    if (!holdExpiresAt) return undefined;
+    const updateTimeLeft = () => setHoldSecondsLeft(Math.max(0, Math.ceil((new Date(holdExpiresAt).getTime() - Date.now()) / 1000)));
+    updateTimeLeft();
+    const timer = window.setInterval(updateTimeLeft, 1000);
+    return () => window.clearInterval(timer);
+  }, [holdExpiresAt]);
 
   useEffect(() => {
     const loadPaymentMethods = async () => {
@@ -78,7 +89,7 @@ const BookingDetail = () => {
   const total = selectedSeats?.reduce((sum, seat) => sum + Number(seat.seatPrice), 0) ?? 0;
   const selectedPaymentMethod = paymentMethods.find((method) => method.paymentMethodId === selectedPaymentMethodId);
 
-  if (!movie || !showtime || !selectedSeats?.length) {
+  if (!movie || !showtime || !selectedSeats?.length || !bookingId || !holdExpiresAt) {
     return <main className="detail-page"><button className="detail-close" type="button" aria-label="Close booking detail" onClick={() => navigate("/", { replace: true })}>x</button><p className="catalog-state">Booking details are unavailable.</p></main>;
   }
 
@@ -99,6 +110,7 @@ const BookingDetail = () => {
           </section>
           <section className="detail-transaction">
             <h2>Order Summary</h2>
+            <p className="detail-payment-error" role="status">{holdSecondsLeft > 0 ? `Complete payment within ${Math.floor(holdSecondsLeft / 60)}:${String(holdSecondsLeft % 60).padStart(2, "0")} to keep these seats.` : "Your 15-minute seat hold has expired. Please select your seats again."}</p>
             <h3>Transaction Details</h3>
             {ticketLines.map(([seatType, line]) => <div className="detail-price-line" key={seatType}><span>{seatType.toUpperCase()}</span><span>{formatPrice(line.price)} x{line.quantity}<small>{formatPrice(line.price * line.quantity)}</small></span></div>)}
             <div className="detail-total"><strong>Total Payment</strong><strong>{formatPrice(total)}</strong></div>
@@ -108,7 +120,7 @@ const BookingDetail = () => {
               {paymentMethods.map((method) => <option value={method.paymentMethodId} key={method.paymentMethodId}>{method.name}</option>)}
             </select>
             {paymentError && <p className="detail-payment-error">{paymentError}</p>}
-            <button className="detail-checkout" type="button" disabled={!selectedPaymentMethod} onClick={() => selectedPaymentMethod && navigate("/user/booking/payment", { state: { movie, showtime, selectedSeats, total, paymentMethod: selectedPaymentMethod } })}>Checkout Ticket</button>
+            <button className="detail-checkout" type="button" disabled={!selectedPaymentMethod || holdSecondsLeft <= 0} onClick={() => selectedPaymentMethod && navigate("/user/booking/payment", { state: { movie, showtime, selectedSeats, total, paymentMethod: selectedPaymentMethod, bookingId, holdExpiresAt } })}>Checkout Ticket</button>
           </section>
         </div>
       </section>

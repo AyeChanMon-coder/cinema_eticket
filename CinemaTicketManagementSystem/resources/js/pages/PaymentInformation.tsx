@@ -20,6 +20,8 @@ interface PaymentInformationState {
   total?: number;
   paymentMethod?: PaymentMethod;
   paymentId?: number;
+  bookingId?: number;
+  holdExpiresAt?: string;
 }
 
 const getImageUrl = (imageUrl?: string | null) => {
@@ -43,6 +45,9 @@ const PaymentInformation = () => {
   const [paymentMethod, setPaymentMethod] = useState(initialState.paymentMethod);
   const [paymentSlip, setPaymentSlip] = useState<File | null>(null);
   const [paymentId, setPaymentId] = useState<number | null>(initialState.paymentId ?? null);
+  const [bookingId] = useState<number | null>(initialState.bookingId ?? null);
+  const [holdExpiresAt] = useState(initialState.holdExpiresAt);
+  const [holdSecondsLeft, setHoldSecondsLeft] = useState(() => initialState.holdExpiresAt ? Math.max(0, Math.ceil((new Date(initialState.holdExpiresAt).getTime() - Date.now()) / 1000)) : 0);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "approved" | "rejected" | "expired" | "cancelled">(initialState.paymentId ? "pending" : "idle");
   const [loadingPayment, setLoadingPayment] = useState(Boolean(initialState.paymentId && (!initialState.movie || !initialState.paymentMethod)));
   const [submitting, setSubmitting] = useState(false);
@@ -51,6 +56,14 @@ const PaymentInformation = () => {
   const handlePaymentSlipChange = (event: ChangeEvent<HTMLInputElement>) => {
     setPaymentSlip(event.target.files?.[0] ?? null);
   };
+
+  useEffect(() => {
+    if (!holdExpiresAt || paymentId) return undefined;
+    const updateTimeLeft = () => setHoldSecondsLeft(Math.max(0, Math.ceil((new Date(holdExpiresAt).getTime() - Date.now()) / 1000)));
+    updateTimeLeft();
+    const timer = window.setInterval(updateTimeLeft, 1000);
+    return () => window.clearInterval(timer);
+  }, [holdExpiresAt, paymentId]);
 
   useEffect(() => {
     if (!paymentId || (movie && showtime && selectedSeats?.length && paymentMethod)) return;
@@ -76,8 +89,12 @@ const PaymentInformation = () => {
   }, [movie, paymentId, paymentMethod, selectedSeats, showtime]);
 
   const submitPayment = async () => {
-    if (!paymentSlip || !showtime || !selectedSeats?.length || !paymentMethod) {
+    if (!paymentSlip || !showtime || !selectedSeats?.length || !paymentMethod || !bookingId) {
       setError("Please upload your payment screenshot first.");
+      return;
+    }
+    if (holdSecondsLeft <= 0) {
+      setError("Your 15-minute seat hold has expired. Please select your seats again.");
       return;
     }
 
@@ -85,10 +102,9 @@ const PaymentInformation = () => {
     setError("");
     try {
       const payload = new FormData();
-      payload.append("showtimeId", String(showtime.showtimeId));
+      payload.append("bookingId", String(bookingId));
       payload.append("amount", String(total ?? 0));
       payload.append("paymentMethodId", String(paymentMethod.paymentMethodId));
-      selectedSeats.forEach((seat) => payload.append("seatIds[]", String(seat.seatId)));
       payload.append("paymentSlip", paymentSlip);
       const response = await api.post("/payments", payload);
       setPaymentId(response.data.paymentId);
@@ -118,6 +134,10 @@ const PaymentInformation = () => {
 
   if (loadingPayment) {
     return <main className="payment-page"><p className="catalog-state">Loading payment information...</p></main>;
+  }
+
+  if (!paymentId && holdExpiresAt && holdSecondsLeft <= 0) {
+    return <main className="payment-page"><section className="payment-result"><h1>Seat hold expired</h1><div className="payment-result-icon payment-result-icon-rejected" aria-hidden="true">×</div><p className="payment-result-message payment-result-message-rejected">Your 15-minute seat hold expired before payment was submitted. Please start a new booking if seats are still available.</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
   }
 
   if (paymentStatus === "rejected") {
@@ -152,13 +172,14 @@ const PaymentInformation = () => {
       <section className="payment-page-card">
         <h1>Payment Information</h1>
         <p className="payment-page-order">{movie?.title ?? "Movie"} · {showtime?.date ?? ""} · {selectedSeats.map((seat) => seat.seatNumber).join(", ")}</p>
+        {holdExpiresAt && <p className="payment-waiting">Complete payment within {Math.floor(holdSecondsLeft / 60)}:{String(holdSecondsLeft % 60).padStart(2, "0")} to keep these seats.</p>}
         {qrImageUrl ? <img className="payment-info-qr" src={qrImageUrl} alt={`${paymentMethod.name} QR code`} /> : <div className="payment-info-qr payment-info-qr-empty">QR code unavailable</div>}
         <div className="payment-info-bank"><h2>Bank Information</h2><p><strong>Payment method</strong><span>{paymentMethod.name}</span></p><p><strong>Account name</strong><span>{paymentMethod.accountName || "-"}</span></p><p><strong>Account number</strong><span>{paymentMethod.accountNumber || "-"}</span></p><p><strong>Total amount</strong><span>{Number(total ?? 0).toFixed(2)} MMK</span></p></div>
         <label className="payment-slip-upload"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePaymentSlipChange} />{paymentSlip ? paymentSlip.name : "Upload Your Payment Screenshot"}</label>
         {error && <p className="payment-submit-error">{error}</p>}
         {paymentStatus === "pending" && <p className="payment-waiting">Waiting for admin to verify your payment...</p>}
         {paymentStatus === "rejected" && <p className="payment-submit-error">Payment was rejected. Please upload a valid screenshot and submit again.</p>}
-        <div className="payment-info-actions"><button type="button" disabled={submitting || paymentStatus === "pending"} onClick={() => void submitPayment()}>{submitting ? "Submitting..." : "Submit"}</button><button type="button" onClick={() => navigate(-1)}>Cancel</button></div>
+        <div className="payment-info-actions"><button type="button" disabled={submitting || paymentStatus === "pending" || holdSecondsLeft <= 0} onClick={() => void submitPayment()}>{submitting ? "Submitting..." : "Submit"}</button><button type="button" onClick={() => navigate(-1)}>Cancel</button></div>
       </section>
     </main>
   );

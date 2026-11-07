@@ -12,7 +12,7 @@ class PaymentMethodController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            PaymentMethod::orderBy('sortOrder')->orderBy('name')->get()
+            PaymentMethod::latest('paymentMethodId')->get()
         );
     }
 
@@ -89,6 +89,6 @@ class PaymentMethodController extends Controller
             })
             ->max();
 
-        return 'C-' . str_pad((string) ($lastNumber + 1), 4, '0', STR_PAD_LEFT);
+        return 'C-'.str_pad((string) ($lastNumber + 1), 4, '0', STR_PAD_LEFT);
     }
 }

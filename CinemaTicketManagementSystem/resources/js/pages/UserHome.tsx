@@ -193,8 +193,8 @@ const UserHome = () => {
     try {
       if (!notification.isRead) {
         await api.patch(`/notifications/${notification.notificationId}/read`);
-        setNotifications((current) => current.map((item) => item.notificationId === notification.notificationId ? { ...item, isRead: true } : item));
       }
+      setNotifications((current) => current.filter((item) => item.notificationId !== notification.notificationId));
     } finally {
       setNotificationsOpen(false);
       setProfileOpen(false);

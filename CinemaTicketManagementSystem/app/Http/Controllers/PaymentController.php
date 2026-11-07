@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\Showtime;
 use App\Models\UserNotification;
+use App\Services\AdminNotificationService;
 use App\Services\SeatHoldService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class PaymentController extends Controller
     public function index(SeatHoldService $seatHoldService): JsonResponse
     {
         $seatHoldService->expireOverdue();
-        $payments = Payment::with(['booking.user', 'invoice'])->get();
+        $payments = Payment::with(['booking.user', 'invoice'])->latest('paymentId')->get();
 
         return response()->json($payments);
     }
@@ -29,20 +30,34 @@ class PaymentController extends Controller
         return response()->json($payment->fresh()->load(['booking.user', 'invoice']));
     }
 
-    public function submit(Request $request, SeatHoldService $seatHoldService): JsonResponse
-    {
+    public function submit(
+        Request $request,
+        SeatHoldService $seatHoldService,
+        AdminNotificationService $adminNotifications,
+    ): JsonResponse {
+        abort_unless((int) $request->user()->userType === 1, 403);
+
         $data = $request->validate([
-            'showtimeId' => 'required|exists:showtimes,showtimeId',
-            'seatIds' => 'required|array|min:1',
-            'seatIds.*' => 'required|integer|distinct|exists:seats,seatId',
+            'bookingId' => 'required|integer|exists:bookings,bookingId',
             'amount' => 'required|numeric|min:0',
             'paymentMethodId' => 'required|exists:payment_methods,paymentMethodId',
             'paymentSlip' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $seatHoldService->expireOverdue();
-        $payment = DB::transaction(function () use ($data, $request, $seatHoldService) {
-            $showtime = Showtime::whereKey($data['showtimeId'])->lockForUpdate()->firstOrFail();
+        $payment = DB::transaction(function () use ($data, $request, $seatHoldService, $adminNotifications) {
+            $booking = Booking::whereKey($data['bookingId'])->lockForUpdate()->firstOrFail();
+            abort_unless((int) $booking->userId === (int) $request->user()->userId, 403);
+            abort_unless(
+                $booking->status === 'pending'
+                    && $booking->holdExpiresAt
+                    && $booking->holdExpiresAt->isAfter(now())
+                    && ! $booking->payment()->exists(),
+                422,
+                'Your 15-minute seat hold has expired. Please select your seats again.'
+            );
+
+            $showtime = Showtime::whereKey($booking->showtimeId)->lockForUpdate()->firstOrFail();
             abort_unless(
                 $showtime->isUpcoming(),
                 422,
@@ -50,18 +65,10 @@ class PaymentController extends Controller
             );
 
             $paymentMethod = PaymentMethod::findOrFail($data['paymentMethodId']);
-            $seatHoldService->lockAndAssertAvailable($showtime, $data['seatIds']);
+            $seatIds = $booking->seats()->pluck('seats.seatId')->all();
+            $seatHoldService->lockAndAssertAvailable($showtime, $seatIds, $booking->bookingId);
 
-            $booking = Booking::create([
-                'bookingDate' => now()->toDateString(),
-                'status' => 'pending',
-                'userId' => $request->user()->userId,
-                'showtimeId' => $data['showtimeId'],
-                'holdExpiresAt' => now()->addMinutes(15),
-            ]);
-            $booking->seats()->attach($data['seatIds']);
-
-            return Payment::create([
+            $payment = Payment::create([
                 'amount' => $data['amount'],
                 'paymentMethod' => $paymentMethod->name,
                 'paymentMethodId' => $data['paymentMethodId'],
@@ -69,6 +76,11 @@ class PaymentController extends Controller
                 'paymentSlipUrl' => $request->file('paymentSlip')->store('payment-slips', 'public'),
                 'bookingId' => $booking->bookingId,
             ]);
+            $booking->update(['holdExpiresAt' => null]);
+
+            $adminNotifications->notifyNewPendingPayment($payment);
+
+            return $payment;
         });
 
         return response()->json($payment->load('paymentMethod'), 201);
@@ -84,20 +96,14 @@ class PaymentController extends Controller
         return response()->json($payment->load(['paymentMethod', 'booking.showtime.movie', 'booking.seats']));
     }
 
-    public function updateStatus(Request $request, Payment $payment, SeatHoldService $seatHoldService): JsonResponse
+    public function updateStatus(Request $request, Payment $payment): JsonResponse
     {
         $data = $request->validate(['paymentStatus' => 'required|in:approved,rejected']);
-        $expired = DB::transaction(function () use ($data, $payment, $seatHoldService) {
+        DB::transaction(function () use ($data, $payment) {
             $booking = Booking::whereKey($payment->bookingId)->lockForUpdate()->firstOrFail();
             $payment = Payment::whereKey($payment->paymentId)->lockForUpdate()->firstOrFail();
 
             abort_unless($payment->paymentStatus === 'pending' && $booking->status === 'pending', 422, 'Only pending payments can be reviewed.');
-
-            if (! $booking->holdExpiresAt || $booking->holdExpiresAt->lte(now())) {
-                $seatHoldService->expirePendingBooking($booking, $payment);
-
-                return true;
-            }
 
             $payment->update(['paymentStatus' => $data['paymentStatus']]);
             $booking->update([
@@ -114,12 +120,7 @@ class PaymentController extends Controller
                     : 'Your payment was rejected. Tap to review your payment information and submit again.',
             ]);
 
-            return false;
         });
-
-        if ($expired) {
-            return response()->json(['message' => 'This seat hold has expired; the payment can no longer be approved.'], 422);
-        }
 
         return response()->json($payment->fresh()->load(['booking.user', 'paymentMethod']));
     }

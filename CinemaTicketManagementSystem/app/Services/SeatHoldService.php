@@ -6,18 +6,20 @@ use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Seat;
 use App\Models\Showtime;
-use App\Models\UserNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SeatHoldService
 {
+    public function __construct(private readonly AdminNotificationService $adminNotifications) {}
+
     public function expireOverdue(): void
     {
         Booking::query()
             ->where('status', 'pending')
             ->whereNotNull('holdExpiresAt')
             ->where('holdExpiresAt', '<=', now())
+            ->whereDoesntHave('payment')
             ->chunkById(200, function ($bookings) {
                 foreach ($bookings as $candidate) {
                     DB::transaction(function () use ($candidate) {
@@ -26,30 +28,20 @@ class SeatHoldService
                             return;
                         }
 
-                        $payment = Payment::where('bookingId', $booking->bookingId)
-                            ->lockForUpdate()
-                            ->first();
-
-                        $this->expirePendingBooking($booking, $payment);
+                        $this->expirePendingBooking($booking);
                     });
                 }
             }, 'bookingId');
     }
 
-    public function expirePendingBooking(Booking $booking, ?Payment $payment = null): void
+    public function expirePendingBooking(Booking $booking): void
     {
-        $booking->update(['status' => 'cancelled']);
-        $payment ??= Payment::where('bookingId', $booking->bookingId)->lockForUpdate()->first();
-
-        if ($payment?->paymentStatus === 'pending') {
-            $payment->update(['paymentStatus' => 'expired']);
-            UserNotification::create([
-                'userId' => $booking->userId,
-                'paymentId' => $payment->paymentId,
-                'title' => 'Booking expired',
-                'message' => 'Your 15-minute seat hold expired. Please start a new booking if seats are still available.',
-            ]);
+        if (Payment::where('bookingId', $booking->bookingId)->lockForUpdate()->first()) {
+            return;
         }
+
+        $booking->update(['status' => 'cancelled', 'holdExpiresAt' => null]);
+        $this->adminNotifications->notifyExpiredHold($booking);
     }
 
     public function lockAndAssertAvailable(

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cinema;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CinemaController extends Controller
 {
     public function index(): JsonResponse
     {
-        $cinemas = Cinema::with('rooms')->get();
+        $cinemas = Cinema::with('rooms')->latest('cinemaId')->get();
+
         return response()->json($cinemas);
     }
 
@@ -22,6 +23,7 @@ class CinemaController extends Controller
         ]);
 
         $cinema = Cinema::create($data);
+
         return response()->json($cinema, 201);
     }
 
@@ -38,12 +40,14 @@ class CinemaController extends Controller
         ]);
 
         $cinema->update($data);
+
         return response()->json($cinema);
     }
 
     public function destroy(Cinema $cinema): JsonResponse
     {
         $cinema->delete();
+
         return response()->json(null, 204);
     }
 }

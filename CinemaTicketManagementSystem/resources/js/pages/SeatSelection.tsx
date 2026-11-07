@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -32,6 +33,7 @@ const SeatSelection = () => {
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeatIds, setSelectedSeatIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creatingHold, setCreatingHold] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -73,6 +75,34 @@ const SeatSelection = () => {
     setSelectedSeatIds((current) => current.includes(seat.seatId) ? current.filter((id) => id !== seat.seatId) : [...current, seat.seatId]);
   };
 
+  const proceedToCheckout = async () => {
+    if (!showtime || !selectedSeats.length) return;
+
+    setCreatingHold(true);
+    setError("");
+    try {
+      const response = await api.post("/bookings/hold", {
+        showtimeId: showtime.showtimeId,
+        seatIds: selectedSeatIds,
+      });
+      navigate("/user/booking/detail", {
+        state: {
+          movie,
+          showtime,
+          selectedSeats: response.data.seats,
+          bookingId: response.data.bookingId,
+          holdExpiresAt: response.data.holdExpiresAt,
+        },
+      });
+    } catch (holdError: unknown) {
+      const responseData = holdError instanceof AxiosError
+        ? holdError.response?.data as { message?: string } | undefined
+        : undefined;
+      setError(responseData?.message ?? "Unable to reserve these seats. Please try again.");
+      setCreatingHold(false);
+    }
+  };
+
   if (!movie || !showtime) return null;
 
   return (
@@ -82,7 +112,7 @@ const SeatSelection = () => {
         {error && <p className="seat-error">{error}</p>}
         {loading ? <p className="seat-state">Loading seats...</p> : <div className="seat-map">{rows.map(([row, rowSeats]) => <div className="seat-row" key={row}><span className="seat-row-label">{row}</span><div className="seat-row-seats">{rowSeats.map((seat) => <button className={`seat${seat.isBooked ? " booked" : ""}${selectedSeatIds.includes(seat.seatId) ? " selected" : ""}`} type="button" key={seat.seatId} disabled={seat.isBooked} aria-label={`${seat.seatNumber}${seat.isBooked ? " booked" : " available"}`} onClick={() => toggleSeat(seat)}>{seat.seatNumber}</button>)}</div></div>)}{rows.length === 0 && <p className="seat-state">No seats configured for this room.</p>}<div className="seat-screen">X</div></div>}
       </section>
-      <footer className="seat-footer"><div><small>TOTAL</small><strong>{total.toFixed(2)} MMK</strong></div><div><small>SEAT</small><strong>{selectedSeats.length ? selectedSeats.map((seat) => seat.seatNumber).join(", ") : "-"}</strong></div><button className="seat-back" type="button" onClick={() => navigate(-1)}>Back</button><button className="seat-proceed" type="button" disabled={!selectedSeats.length} onClick={() => navigate("/user/booking/detail", { state: { movie, showtime, selectedSeats } })}>Proceed Payment</button></footer>
+      <footer className="seat-footer"><div><small>TOTAL</small><strong>{total.toFixed(2)} MMK</strong></div><div><small>SEAT</small><strong>{selectedSeats.length ? selectedSeats.map((seat) => seat.seatNumber).join(", ") : "-"}</strong></div><button className="seat-back" type="button" onClick={() => navigate(-1)}>Back</button><button className="seat-proceed" type="button" disabled={!selectedSeats.length || creatingHold} onClick={() => void proceedToCheckout()}>{creatingHold ? "Reserving..." : "Proceed Payment"}</button></footer>
     </main>
   );
 };

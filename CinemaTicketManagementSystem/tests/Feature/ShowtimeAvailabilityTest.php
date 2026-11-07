@@ -146,17 +146,11 @@ class ShowtimeAvailabilityTest extends TestCase
 
     public function test_started_showtimes_reject_customer_and_admin_bookings(): void
     {
-        Storage::fake('public');
-        $payload = [
-            'showtimeId' => $this->startedShowtimeId,
-            'seatIds' => [$this->seatId],
-            'amount' => 1000,
-            'paymentMethodId' => $this->paymentMethodId,
-            'paymentSlip' => $this->fakePaymentSlip(),
-        ];
-
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/payments', $payload)
+            ->postJson('/api/bookings/hold', [
+                'showtimeId' => $this->startedShowtimeId,
+                'seatIds' => [$this->seatId],
+            ])
             ->assertUnprocessable()
             ->assertJsonPath('message', 'This showtime has already started.');
 
@@ -179,21 +173,25 @@ class ShowtimeAvailabilityTest extends TestCase
     public function test_showtime_at_exact_start_time_is_not_bookable_but_future_showtime_is(): void
     {
         $atStartShowtimeId = $this->createShowtime($this->futureMovieId, '12:00:00');
-        $payload = [
-            'showtimeId' => $atStartShowtimeId,
+        Storage::fake('public');
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/bookings/hold', [
+                'showtimeId' => $atStartShowtimeId,
+                'seatIds' => [$this->seatId],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'This showtime has already started.');
+
+        $hold = $this->postJson('/api/bookings/hold', [
+            'showtimeId' => $this->futureShowtimeId,
             'seatIds' => [$this->seatId],
+        ])->assertCreated();
+        $this->postJson('/api/payments', [
+            'bookingId' => $hold->json('bookingId'),
             'amount' => 1000,
             'paymentMethodId' => $this->paymentMethodId,
             'paymentSlip' => $this->fakePaymentSlip(),
-        ];
-
-        Storage::fake('public');
-        $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/payments', $payload)
-            ->assertUnprocessable();
-
-        $payload['showtimeId'] = $this->futureShowtimeId;
-        $this->postJson('/api/payments', $payload)->assertCreated();
+        ])->assertCreated();
     }
 
     private function createMovie(string $title): int

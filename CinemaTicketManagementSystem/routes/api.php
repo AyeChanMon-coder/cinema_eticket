@@ -48,11 +48,14 @@ Route::middleware('throttle:60,1')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
         Route::get('/bookings', [BookingController::class, 'customerIndex']);
+        Route::post('/bookings/hold', [BookingController::class, 'hold']);
     });
 });
 
 Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/notifications', [NotificationController::class, 'adminIndex']);
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'adminMarkRead']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
