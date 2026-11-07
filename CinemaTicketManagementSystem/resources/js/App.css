@@ -140,7 +140,21 @@ button { cursor: pointer; }
 .access-card h1 { margin: 0 0 8px; font-size: 1.6rem; }
 .access-card p:not(.eyebrow) { color: #64748b; }
 .modal-field select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font: inherit; font-size: 0.9rem; }
-
+.booking-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.booking-summary-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; box-shadow: 0 8px 20px rgba(15, 23, 42, .05); color: #64748b; font-size: .9rem; }
+.booking-summary-card strong { color: #111827; font-size: 1.4rem; }
+.booking-toolbar-end { display: flex; align-items: center; gap: 10px; }
+.booking-filter-label { color: #64748b; font-size: .85rem; }
+.booking-filter { padding: 8px 30px 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; color: #374151; font: inherit; font-size: .85rem; }
+.booking-status-pending { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.booking-status-confirmed { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.booking-status-cancelled { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.booking-detail-modal { max-height: 90vh; overflow-y: auto; }
+.booking-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; margin: 0; }
+.booking-detail-grid > div { padding: 12px 0; border-top: 1px solid #f1f5f9; }
+.booking-detail-grid dt { margin-bottom: 5px; color: #64748b; font-size: .78rem; }
+.booking-detail-grid dd { margin: 0; color: #1f2937; font-size: .9rem; font-weight: 600; }
+.tbl td small { color: #64748b; }
 .fw-600 { font-weight: 600; }
 
 /* ========== PAGINATION ========== */
@@ -276,6 +290,9 @@ button { cursor: pointer; }
   .page-head, .dashboard-header, .movie-card { flex-direction: column; align-items: flex-start; }
   .tbl-toolbar { flex-direction: column; align-items: stretch; }
   .tbl-search { width: 100%; }
+  .booking-toolbar-end { justify-content: space-between; flex-wrap: wrap; }
+  .booking-summary-grid { grid-template-columns: 1fr; gap: 10px; }
+  .booking-detail-grid { grid-template-columns: 1fr; }
   .top-header { padding: 14px 16px; }
   .main-content { padding: 18px 14px; }
   .modal-grid { grid-template-columns: 1fr; gap: 0; }

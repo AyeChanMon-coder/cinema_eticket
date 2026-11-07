@@ -20,6 +20,7 @@ import UserBookings from "./pages/UserBookings";
 import SeatsPage from "./pages/SeatsPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import PaymentMethodsPage from "./pages/PaymentMethodsPage";
+import BookingsPage from "./pages/BookingsPage";
 
 function App() {
   return (
@@ -43,7 +44,7 @@ function App() {
             <Route path="/admin/movies" element={<MoviesPage />} />
             <Route path="/admin/cinemas" element={<CinemasPage />} />
             <Route path="/admin/seats" element={<SeatsPage />} />
-            <Route path="/admin/bookings" element={<Dashboard />} />
+            <Route path="/admin/bookings" element={<BookingsPage />} />
             <Route path="/admin/payments" element={<PaymentsPage />} />
             <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
