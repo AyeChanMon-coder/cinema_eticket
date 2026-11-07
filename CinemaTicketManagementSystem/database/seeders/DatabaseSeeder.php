@@ -58,11 +58,11 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        $movie1 = Movie::create(['title' => 'The Dark Knight', 'genre' => 'Action', 'duration' => 152, 'rating' => 9.0]);
-        $movie2 = Movie::create(['title' => 'Inception', 'genre' => 'Sci-Fi', 'duration' => 148, 'rating' => 8.8]);
-        $movie3 = Movie::create(['title' => 'Your Name', 'genre' => 'Animation', 'duration' => 106, 'rating' => 8.4]);
-        $movie4 = Movie::create(['title' => 'Parasite', 'genre' => 'Thriller', 'duration' => 132, 'rating' => 8.5]);
-        $movie5 = Movie::create(['title' => 'Interstellar', 'genre' => 'Sci-Fi', 'duration' => 169, 'rating' => 8.7]);
+        $movie1 = Movie::create(['title' => 'The Dark Knight', 'genre' => 'Action', 'description' => 'A masked vigilante protects Gotham from a dangerous criminal mastermind.', 'duration' => 152, 'rating' => 9.0]);
+        $movie2 = Movie::create(['title' => 'Inception', 'genre' => 'Sci-Fi', 'description' => 'A skilled team enters dreams to plant an idea in a target’s mind.', 'duration' => 148, 'rating' => 8.8]);
+        $movie3 = Movie::create(['title' => 'Your Name', 'genre' => 'Animation', 'description' => 'Two teenagers discover an extraordinary connection across time and place.', 'duration' => 106, 'rating' => 8.4]);
+        $movie4 = Movie::create(['title' => 'Parasite', 'genre' => 'Thriller', 'description' => 'Two families become entangled through an unexpected and unsettling relationship.', 'duration' => 132, 'rating' => 8.5]);
+        $movie5 = Movie::create(['title' => 'Interstellar', 'genre' => 'Sci-Fi', 'description' => 'Explorers travel beyond Earth in search of a future for humanity.', 'duration' => 169, 'rating' => 8.7]);
 
         Showtime::create(['date' => '2026-08-08', 'time' => '10:00:00', 'roomId' => $room1->roomId, 'movieId' => $movie1->movieId]);
         Showtime::create(['date' => '2026-08-08', 'time' => '14:00:00', 'roomId' => $room1->roomId, 'movieId' => $movie2->movieId]);

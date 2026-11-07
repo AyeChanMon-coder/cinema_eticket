@@ -33,9 +33,13 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'profileImagePath',
         'password',
         'userType',
     ];
+
+    protected $appends = ['profileImageUrl'];
 
     protected $hidden = [
         'password',
@@ -46,6 +50,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        return $this->profileImagePath ? '/storage/' . ltrim($this->profileImagePath, '/') : null;
+    }
 
     /**
      * Get the bookings for the user.

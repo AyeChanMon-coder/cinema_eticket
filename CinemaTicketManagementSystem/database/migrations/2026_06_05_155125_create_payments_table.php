@@ -19,6 +19,7 @@ return new class extends Migration
         $table->string('paymentSlipUrl')->nullable(); // Screenshot တင်ဖို့အတွက် ဖြည့်စွက်ပေးထားခြင်း
         // Booking (1) -> Has -> Payment (1)
         $table->foreignId('bookingId')->unique()->constrained('bookings', 'bookingId')->onDelete('cascade');
+        $table->foreignId('paymentMethodId')->nullable()->constrained('payment_methods', 'paymentMethodId')->onDelete('set null');
         $table->timestamps();
     });
     }

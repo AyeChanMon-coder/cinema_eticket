@@ -17,6 +17,7 @@ return new class extends Migration
         $table->boolean('isBooked')->default(false);
         $table->string('seatType');
         $table->integer('seatPrice');
+        $table->integer('status')->default(0); // 0 = Available, 1 = Booked, 2 = Reserved
         // Room (1) -> Contains -> Seat (Many)
         $table->foreignId('roomId')->constrained('rooms', 'roomId')->onDelete('cascade');
         $table->timestamps();

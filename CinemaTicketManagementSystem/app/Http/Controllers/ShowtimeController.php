@@ -3,14 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Showtime;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ShowtimeController extends Controller
 {
     public function index(): JsonResponse
     {
         $showtimes = Showtime::with('movie', 'room.cinema')->get();
+
+        return response()->json($showtimes);
+    }
+
+    public function publicIndex(): JsonResponse
+    {
+        $showtimes = Showtime::upcoming()->with('movie', 'room.cinema')->get();
+
         return response()->json($showtimes);
     }
 
@@ -24,6 +32,7 @@ class ShowtimeController extends Controller
         ]);
 
         $showtime = Showtime::create($data);
+
         return response()->json($showtime, 201);
     }
 
@@ -42,12 +51,14 @@ class ShowtimeController extends Controller
         ]);
 
         $showtime->update($data);
+
         return response()->json($showtime);
     }
 
     public function destroy(Showtime $showtime): JsonResponse
     {
         $showtime->delete();
+
         return response()->json(null, 204);
     }
 }

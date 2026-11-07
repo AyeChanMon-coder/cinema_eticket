@@ -30,11 +30,43 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'userType' => $user->userType,
+            'userId' => $user->userId,
+            'userType' => (int) $user->userType,
         ], 201);
     }
 
-    public function login(Request $request)
+    public function userLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if (! Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid email or password'], 401);
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+        if ((int) $user->userType !== 1) {
+            Auth::logout();
+            return response()->json(['message' => 'Customer account is required'], 403);
+        }
+
+        return response()->json([
+            'access_token' => $user->createToken('user_token')->plainTextToken,
+            'token_type' => 'Bearer',
+            'userId' => $user->userId,
+            'userType' => 1,
+        ]);
+    }
+
+    public function userRegister(Request $request)
+    {
+        return $this->register($request);
+    }
+
+    public function adminLogin(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|email',
@@ -47,23 +79,26 @@ class AuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if (! in_array($user->userType, [2, 3], true)) {
-            return response()->json(['message' => 'Unauthorized user'], 403);
+        if (! in_array((int) $user->userType, [2, 3], true)) {
+            Auth::logout();
+            return response()->json(['message' => 'Admin access is required'], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('admin_token')->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'userType' => $user->userType,
+            'userId' => $user->userId,
+            'userType' => (int) $user->userType,
         ]);
-
-
-
-
-
     }
+
+    public function login(Request $request)
+    {
+        return $this->adminLogin($request);
+    }
+
     public function logout(Request $request)
     {
         // destroy the current access token

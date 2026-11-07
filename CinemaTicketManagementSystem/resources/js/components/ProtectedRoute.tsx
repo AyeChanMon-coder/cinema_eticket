@@ -4,7 +4,7 @@ const ProtectedRoute: React.FC = () => {
   const token: string | null = localStorage.getItem("admin_token");
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return <Outlet />;

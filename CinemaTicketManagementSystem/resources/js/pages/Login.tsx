@@ -13,19 +13,25 @@ const Login: React.FC = () => {
     setError("");
     
     try {
-      const response = await api.post("/login", { email, password });
+      const response = await api.post("/admin/login", { email, password });
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user_id");
       localStorage.setItem("admin_token", response.data.access_token);
-      navigate("/admin/movies");
+      localStorage.setItem("admin_user_id", String(response.data.userId));
+      localStorage.setItem("admin_user_type", String(response.data.userType));
+      navigate("/admin/dashboard");
     } catch (err: unknown) {
-      setError("Invalid credentials. Please try again.");
+      setError("Admin email or password is incorrect.");
     }
   };
 
   return (
-    <main>
-      <h1>Admin Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <main className="login-page">
+      <section className="login-panel">
+        <img className="login-logo" src="/cinema-logo.svg" alt="Cinema" />
+        <h1>LOGIN</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="login-field">
           <label htmlFor="email">Email</label>
           <input
             id="email"
@@ -34,8 +40,8 @@ const Login: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div>
+          </div>
+          <div className="login-field">
           <label htmlFor="password">Password</label>
           <input
             id="password"
@@ -44,10 +50,11 @@ const Login: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit">Sign In</button>
-      </form>
+          </div>
+          {error && <p className="login-error">{error}</p>}
+          <button className="login-button" type="submit">Login</button>
+        </form>
+      </section>
     </main>
   );
 };

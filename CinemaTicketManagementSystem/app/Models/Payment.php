@@ -14,14 +14,25 @@ class Payment extends Model
     protected $fillable = [
         'amount',
         'paymentMethod',
+        'paymentMethodId',
         'paymentStatus',
         'paymentSlipUrl',
         'bookingId',
     ];
 
+    public function getPaymentSlipUrlAttribute(?string $path): ?string
+    {
+        return $path ? '/storage/' . ltrim($path, '/') : null;
+    }
+
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class, 'bookingId', 'bookingId');
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class, 'paymentMethodId', 'paymentMethodId');
     }
 
     public function invoice(): HasOne
