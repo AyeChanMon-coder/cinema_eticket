@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -42,7 +43,7 @@ const PaymentInformation = () => {
   const [paymentMethod, setPaymentMethod] = useState(initialState.paymentMethod);
   const [paymentSlip, setPaymentSlip] = useState<File | null>(null);
   const [paymentId, setPaymentId] = useState<number | null>(initialState.paymentId ?? null);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "approved" | "rejected">(initialState.paymentId ? "pending" : "idle");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "approved" | "rejected" | "expired" | "cancelled">(initialState.paymentId ? "pending" : "idle");
   const [loadingPayment, setLoadingPayment] = useState(Boolean(initialState.paymentId && (!initialState.movie || !initialState.paymentMethod)));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -92,15 +93,18 @@ const PaymentInformation = () => {
       const response = await api.post("/payments", payload);
       setPaymentId(response.data.paymentId);
       setPaymentStatus("pending");
-    } catch (submitError) {
-      setError("Unable to submit payment. Please check your screenshot and try again.");
+    } catch (submitError: unknown) {
+      const responseData = submitError instanceof AxiosError
+        ? submitError.response?.data as { message?: string } | undefined
+        : undefined;
+      setError(responseData?.message ?? "Unable to submit payment. Please check your screenshot and try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
   useEffect(() => {
-    if (!paymentId || paymentStatus === "approved" || paymentStatus === "rejected") return;
+    if (!paymentId || paymentStatus === "approved" || paymentStatus === "rejected" || paymentStatus === "expired" || paymentStatus === "cancelled") return;
     const timer = window.setInterval(async () => {
       try {
         const response = await api.get(`/payments/${paymentId}/status`);
@@ -118,6 +122,14 @@ const PaymentInformation = () => {
 
   if (paymentStatus === "rejected") {
     return <main className="payment-page"><section className="payment-result"><h1>Sorry!</h1><div className="payment-result-icon payment-result-icon-rejected" aria-hidden="true">×</div><p className="payment-result-message payment-result-message-rejected">Your payment was rejected. Try again</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
+  }
+
+  if (paymentStatus === "expired") {
+    return <main className="payment-page"><section className="payment-result"><h1>Seat hold expired</h1><div className="payment-result-icon payment-result-icon-rejected" aria-hidden="true">×</div><p className="payment-result-message payment-result-message-rejected">The 15-minute seat hold expired. Please start a new booking if seats are still available.</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
+  }
+
+  if (paymentStatus === "cancelled") {
+    return <main className="payment-page"><section className="payment-result"><h1>Booking cancelled</h1><div className="payment-result-icon payment-result-icon-rejected" aria-hidden="true">×</div><p className="payment-result-message payment-result-message-rejected">This booking was cancelled. Please start a new booking if you still wish to purchase tickets.</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
   }
 
   if (!paymentMethod || !selectedSeats?.length) {

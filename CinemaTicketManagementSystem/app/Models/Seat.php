@@ -7,8 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Seat extends Model
 {
     protected $primaryKey = 'seatId';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
+
     protected $fillable = ['seatNumber', 'isBooked', 'seatType', 'seatPrice', 'status', 'roomId'];
+
+    protected $hidden = ['isBooked'];
+
     protected $casts = ['isBooked' => 'boolean', 'seatPrice' => 'integer', 'status' => 'integer'];
 }

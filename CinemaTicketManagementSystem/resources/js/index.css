@@ -303,6 +303,7 @@ body.theme-dark .profile-modal-actions button:first-child { border-color: #4b556
 .payment-status-pending { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
 .payment-status-approved { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
 .payment-status-rejected { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.payment-status-expired, .payment-status-cancelled { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
 .user-bookings-page { min-height: 100vh; padding: 28px 6% 56px; background: #fff; color: #111; }
 .user-bookings-header { display: flex; align-items: center; gap: 16px; width: min(100%, 820px); margin: 0 auto 28px; }
 .user-bookings-header button { border: 0; background: transparent; color: #111; font-size: 26px; line-height: 1; cursor: pointer; }

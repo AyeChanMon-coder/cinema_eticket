@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
@@ -12,6 +12,16 @@ class MovieController extends Controller
     public function index(): JsonResponse
     {
         $movies = Movie::with('showtimes.room.cinema')->get();
+
+        return response()->json($movies);
+    }
+
+    public function publicIndex(): JsonResponse
+    {
+        $movies = Movie::whereHas('showtimes', fn ($query) => $query->upcoming())
+            ->with(['showtimes' => fn ($query) => $query->upcoming()->with('room.cinema')])
+            ->get();
+
         return response()->json($movies);
     }
 
@@ -31,12 +41,18 @@ class MovieController extends Controller
         }
 
         $movie = Movie::create($data);
+
         return response()->json($movie, 201);
     }
 
     public function show(Movie $movie): JsonResponse
     {
         return response()->json($movie->load('showtimes'));
+    }
+
+    public function publicShow(Movie $movie): JsonResponse
+    {
+        return response()->json($movie->load(['showtimes' => fn ($query) => $query->upcoming()]));
     }
 
     public function update(Request $request, Movie $movie): JsonResponse
@@ -62,6 +78,7 @@ class MovieController extends Controller
         }
 
         $movie->update($data);
+
         return response()->json($movie);
     }
 
@@ -71,6 +88,7 @@ class MovieController extends Controller
             Storage::disk('public')->delete($movie->image);
         }
         $movie->delete();
+
         return response()->json(null, 204);
     }
 }

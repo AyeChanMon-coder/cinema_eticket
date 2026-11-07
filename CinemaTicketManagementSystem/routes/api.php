@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\InvoiceController;
@@ -24,10 +24,10 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::post('/user/login', [AuthController::class, 'userLogin']);
     Route::post('/user/register', [AuthController::class, 'userRegister']);
 
-    Route::get('/movies', [MovieController::class, 'index']);
-    Route::get('/movies/{movie}', [MovieController::class, 'show']);
+    Route::get('/movies', [MovieController::class, 'publicIndex']);
+    Route::get('/movies/{movie}', [MovieController::class, 'publicShow']);
 
-    Route::get('/showtimes', [ShowtimeController::class, 'index']);
+    Route::get('/showtimes', [ShowtimeController::class, 'publicIndex']);
     Route::get('/showtimes/{showtime}', [ShowtimeController::class, 'show']);
 
     Route::get('/payment-methods', [PaymentMethodController::class, 'publicIndex']);
@@ -38,6 +38,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/rooms', [RoomController::class, 'index']);
     Route::get('/rooms/{room}', [RoomController::class, 'show']);
     Route::get('/rooms/{room}/seats', [SeatController::class, 'byRoom']);
+    Route::get('/showtimes/{showtime}/seats', [SeatController::class, 'byShowtime']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/payments', [PaymentController::class, 'submit']);
         Route::get('/payments/{payment}/status', [PaymentController::class, 'customerShow']);

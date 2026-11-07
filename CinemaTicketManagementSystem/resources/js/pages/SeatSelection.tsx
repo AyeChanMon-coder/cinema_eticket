@@ -46,7 +46,7 @@ const SeatSelection = () => {
 
     const loadSeats = async () => {
       try {
-        const response = await api.get(`/rooms/${showtime.roomId}/seats`);
+        const response = await api.get(`/showtimes/${showtime.showtimeId}/seats`);
         setSeats(Array.isArray(response.data) ? response.data : []);
       } catch {
         setError("Unable to load seats for this room.");
