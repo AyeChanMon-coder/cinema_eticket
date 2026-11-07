@@ -9,7 +9,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const isAdminRequest = config.url?.startsWith("/admin") || window.location.pathname.startsWith("/admin");
+    const requestPath = config.url ? new URL(config.url, window.location.origin).pathname : "";
+    const isAdminRequest = requestPath.startsWith("/admin") || window.location.pathname.startsWith("/admin");
     const token = isAdminRequest
       ? localStorage.getItem("admin_token")
       : localStorage.getItem("user_token");

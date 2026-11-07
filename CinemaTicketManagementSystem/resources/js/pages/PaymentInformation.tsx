@@ -116,12 +116,20 @@ const PaymentInformation = () => {
     return <main className="payment-page"><p className="catalog-state">Loading payment information...</p></main>;
   }
 
+  if (paymentStatus === "rejected") {
+    return <main className="payment-page"><section className="payment-result"><h1>Sorry!</h1><div className="payment-result-icon payment-result-icon-rejected" aria-hidden="true">×</div><p className="payment-result-message payment-result-message-rejected">Your payment was rejected. Try again</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
+  }
+
   if (!paymentMethod || !selectedSeats?.length) {
     return <main className="payment-page"><button className="detail-close" type="button" onClick={() => navigate("/", { replace: true })}>×</button><p className="catalog-state">Payment information is unavailable.</p></main>;
   }
 
   if (paymentStatus === "approved") {
     return <main className="payment-page"><section className="payment-result"><h1>Payment Success</h1><div className="payment-result-icon" aria-hidden="true">✓</div><button className="payment-result-primary" type="button" onClick={() => navigate("/user/booking/payment/ticket", { state: { movie, showtime, selectedSeats } })}>View Ticket</button><button type="button" onClick={() => navigate("/", { replace: true })}>Back to Homepage</button></section></main>;
+  }
+
+  if (paymentStatus === "pending") {
+    return <main className="payment-page"><section className="payment-result"><h1>Booking Success!</h1><div className="payment-result-icon" aria-hidden="true">✓</div><p className="payment-result-message">Please wait approve from admin</p><button className="payment-result-primary" type="button" onClick={() => navigate("/", { replace: true })}>Back Homepage</button></section></main>;
   }
 
   const qrImageUrl = getImageUrl(paymentMethod.qrCodeImageUrl);

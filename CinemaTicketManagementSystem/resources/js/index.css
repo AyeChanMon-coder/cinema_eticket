@@ -77,10 +77,16 @@ a {
 .catalog-nav a:hover, .catalog-actions a:hover { background: #f1f1f1; }
 .catalog-nav button, .catalog-actions button { border: 0; background: transparent; font: inherit; cursor: pointer; }
 .user-menu { position: relative; display: flex; align-items: center; gap: 10px; }
-.profile-button { position: relative; width: 42px; height: 42px; padding: 0 !important; border-radius: 50%; overflow: visible; }
+.notification-menu { position: relative; order: 3; }
+.notification-bell { position: relative; display: grid !important; place-items: center; width: 36px; height: 36px; padding: 0 !important; border-radius: 50%; background: #f1f1f1 !important; font-size: 18px; }
+.notification-bell:hover, .notification-bell[aria-expanded="true"] { background: #e5e7eb !important; }
+.notification-bell-icon { display: block; font-size: 18px; filter: grayscale(1) brightness(.25); line-height: 1; }
+.notification-menu .notification-count { top: -4px; right: -4px; }
+.notification-menu .profile-notifications { position: absolute; top: calc(100% + 10px); right: 0; z-index: 100; width: min(360px, calc(100vw - 32px)); max-height: min(70vh, 420px); margin: 0; overflow-y: auto; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
+.profile-button { position: relative; order: 2; width: 42px; height: 42px; padding: 0 !important; border-radius: 50%; overflow: visible; }
 .profile-button img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .profile-notification-count { position: absolute; top: -5px; right: -7px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border: 2px solid #fff; border-radius: 10px; background: #b91c1c; color: #fff; font-size: 9px; line-height: 1; }
-.profile-display-name { max-width: 130px; overflow: hidden; color: #111; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.profile-display-name { order: 1; max-width: 130px; overflow: hidden; color: #111; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 20; width: 250px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; box-shadow: 0 12px 26px rgba(15, 23, 42, .14); }
 .profile-dropdown button { display: block; width: 100%; padding: 10px 12px !important; border-radius: 5px; text-align: left; color: #1f2937; }
 .profile-dropdown button:hover { background: #f3f4f6; }
@@ -91,6 +97,9 @@ a {
 .profile-notifications .notification-dropdown-head { padding: 10px 12px; }
 .profile-notifications .notification-item { padding: 10px 12px; }
 .booking-icon { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #20202a !important; color: #fff !important; }
+.search-booking { position: relative; }
+.search-booking::after { content: attr(data-tooltip); position: absolute; top: calc(100% + 8px); left: 50%; z-index: 10; padding: 6px 9px; border-radius: 4px; background: #20202a; color: #fff; font-size: 11px; line-height: 1.2; white-space: nowrap; transform: translate(-50%, -3px); opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; }
+.search-booking:hover::after, .search-booking:focus-visible::after { transform: translate(-50%, 0); opacity: 1; }
 .catalog-content { width: min(100%, 980px); margin: 18px auto 0; padding: 0 24px 60px; }
 .catalog-subheader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .catalog-brand-secondary img { width: 27px; height: 27px; }
@@ -108,6 +117,11 @@ a {
 .notification-item:hover, .notification-item.unread { background: #f7f7f7; }
 .notification-item strong { font-size: 11px; }
 .notification-item span { color: #666; font-size: 10px; line-height: 1.4; }
+.notification-item small { color: #999; font-size: 9px; }
+.notification-see-more { display: block !important; width: calc(100% - 20px) !important; margin: 8px 10px 10px; padding: 8px 10px !important; border: 1px solid #d1d5db !important; border-radius: 4px; background: #fff !important; color: #20202a !important; font-size: 11px !important; text-align: center !important; }
+.notification-see-more:hover { background: #f3f4f6 !important; }
+.payment-approved-notification strong { color: #047857; }
+.payment-rejected-notification strong, .payment-rejected-notification span { color: #b91c1c; }
 .profile-modal-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(17, 17, 17, .62); }
 .profile-modal { position: relative; width: min(100%, 440px); max-height: calc(100vh - 40px); overflow-y: auto; padding: 28px; border-radius: 8px; background: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, .28); }
 .profile-modal h2 { margin: 0 0 22px; color: #222; font-size: 22px; }
@@ -270,6 +284,9 @@ body.theme-dark .profile-modal-actions button:first-child { border-color: #4b556
 .payment-result { width: min(100%, 360px); margin: auto; text-align: center; }
 .payment-result h1 { margin-bottom: 28px; color: #333; font-size: 18px; }
 .payment-result-icon { width: 86px; height: 86px; display: grid; place-items: center; margin: 0 auto 24px; border: 2px solid #2f855a; border-radius: 50%; color: #2f855a; font-size: 46px; }
+.payment-result-message { margin: -12px 0 22px; color: #2f855a; font-size: 13px; }
+.payment-result-icon-rejected { border-color: #b91c1c; color: #b91c1c; }
+.payment-result-message-rejected { color: #b91c1c; }
 .payment-result button { display: block; width: 100%; margin-top: 10px; padding: 10px; border: 1px solid #c8c8c8; border-radius: 4px; background: #fff; color: #666; cursor: pointer; }
 .payment-result .payment-result-primary { border-color: #999; background: #999; color: #fff; }
 .payment-page { height: 100dvh; min-height: 100vh; display: grid; place-items: center; overflow: hidden; padding: 12px 18px; background: #fff; color: #111; }

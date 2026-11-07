@@ -29,6 +29,11 @@ interface UserProfile {
   profileImageUrl?: string | null;
 }
 
+const formatNotificationDate = (date: string) => new Date(date).toLocaleString("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
 const UserHome = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -40,6 +45,7 @@ const UserHome = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({ name: "", email: "", phone: "" });
@@ -196,6 +202,8 @@ const UserHome = () => {
     }
   };
 
+  const visibleNotifications = notificationsExpanded ? notifications : notifications.slice(0, 4);
+
   useEffect(() => {
     if (!selectedMovie) return undefined;
 
@@ -229,10 +237,10 @@ const UserHome = () => {
     <main className="catalog-home">
       <header className="catalog-header">
         <Link className="catalog-brand" to="/"><img src="/cinema-logo.svg" alt="Cinema" /></Link>
-        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src={profile?.profileImageUrl ? `${window.location.origin}${profile.profileImageUrl}` : "/default-user.svg"} alt="User profile" />{notifications.some((notification) => !notification.isRead) && <b className="profile-notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{profile?.name && <span className="profile-display-name">{profile.name}</span>}{profileOpen && <div className="profile-dropdown"><button type="button" onClick={openProfile}>Profile</button><button type="button" onClick={openSettings}>Setting &amp; Privacy</button><button className="profile-notifications-toggle" type="button" onClick={() => setNotificationsOpen((open) => !open)}><span>Notifications</span>{notifications.some((notification) => !notification.isRead) && <b className="notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{notificationsOpen && <div className="profile-notifications"><div className="notification-dropdown-head"><strong>Notifications</strong>{!notifications.length && <small>No notifications</small>}</div>{notifications.map((notification) => <button className={`notification-item${notification.isRead ? "" : " unread"}`} type="button" key={notification.notificationId} onClick={() => void openNotification(notification)}><strong>{notification.title}</strong><span>{notification.message}</span></button>)}</div>}<button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
+        <nav className="catalog-nav">{localStorage.getItem("user_token") ? <div className="user-menu"><div className="notification-menu"><button className="notification-bell" type="button" aria-label="Open notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((open) => !open); setNotificationsExpanded(false); }}><span className="notification-bell-icon" aria-hidden="true">🔔</span>{notifications.some((notification) => !notification.isRead) && <b className="notification-count">{notifications.filter((notification) => !notification.isRead).length}</b>}</button>{notificationsOpen && <div className="profile-notifications"><div className="notification-dropdown-head"><strong>Notifications</strong>{!notifications.length && <small>No notifications</small>}</div>{visibleNotifications.map((notification) => <button className={`notification-item${notification.isRead ? "" : " unread"}${notification.title === "Payment approved" ? " payment-approved-notification" : ""}${notification.title === "Payment rejected" ? " payment-rejected-notification" : ""}`} type="button" key={notification.notificationId} onClick={() => void openNotification(notification)}><strong>{notification.title}</strong><span>{notification.message}</span><small>{formatNotificationDate(notification.created_at)}</small></button>)}{notifications.length > 4 && !notificationsExpanded && <button className="notification-see-more" type="button" onClick={() => setNotificationsExpanded(true)}>See more</button>}</div>}</div><button className="profile-button" type="button" aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}><img src={profile?.profileImageUrl ? `${window.location.origin}${profile.profileImageUrl}` : "/default-user.svg"} alt="User profile" /></button>{profile?.name && <span className="profile-display-name">{profile.name}</span>}{profileOpen && <div className="profile-dropdown"><button type="button" onClick={openProfile}>Profile</button><button type="button" onClick={openSettings}>Setting &amp; Privacy</button><button type="button" onClick={logout}>Sign Out</button></div>}</div> : <><Link to="/user/login" state={{ userEntry: true }}>Login</Link><Link to="/user/register" state={{ userEntry: true }}>Sign up</Link></>}</nav>
       </header>
       <section className="catalog-content">
-        <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" onClick={() => navigate(localStorage.getItem("user_token") ? "/user/bookings" : "/user/login", { state: localStorage.getItem("user_token") ? undefined : { userEntry: true } })}>▤</button></div>
+        <div className="movie-search"><input aria-label="Search movies" placeholder="You can search here !" value={search} onChange={(event) => setSearch(event.target.value)} /><span>⌕</span><button className="booking-icon search-booking" type="button" aria-label="Bookings" data-tooltip="Booking detail" onClick={() => navigate(localStorage.getItem("user_token") ? "/user/bookings" : "/user/login", { state: localStorage.getItem("user_token") ? undefined : { userEntry: true } })}>▤</button></div>
         <h1 className="now-showing-title">Now Showing</h1>
         {loading ? <p className="catalog-state">Loading movies...</p> : <div className="public-movie-grid">{paginatedMovies.map((movie) => <article className="public-movie-card" key={movie.movieId}><button className="public-poster" type="button" aria-label={`View details for ${movie.title}`} onClick={() => { setSelectedMovie(movie); setDescriptionExpanded(false); }}>{movie.image ? <img src={`${window.location.origin}/storage/${movie.image}`} alt={movie.title} /> : <span>No poster</span>}</button><strong>{movie.title}</strong><small>{movie.genre} · {movie.duration} min</small></article>)}</div>}
         {!loading && filteredMovies.length === 0 && <p className="catalog-state">No movies found.</p>}
